@@ -9,7 +9,7 @@ import torch
 from torch.func import functional_call
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from datasets import load_dataset
-from quantlag.export import Served, quantize, dequant, quantized_names, invariant_scale
+from quantlag.export import Served, quantize, dequant, quantized_names, invariant_scale, snapshot
 
 SUFFIX = "\nPlease reason step by step, and put your final answer within \\boxed{}."
 ARMS = {"fp32": None, "rtn": "rtn", "sr": "sr", "ef": "ef", "qurl": "rtn"}
@@ -63,7 +63,7 @@ class Policy:
         self.served_model.requires_grad_(False)
         self.sp = dict(self.served_model.named_parameters())
         self.served = {n: Served(params[n].detach(), grid, self.rule, seed=seed + i) for i, n in enumerate(self.names)}
-        self.master0 = {n: params[n].detach().clone() for n in self.names}
+        self.master0 = {n: snapshot(params[n]) for n in self.names}
         # only sr exports the update itself, so only sr needs the master at the last sync
         self.prev = {n: params[n].detach().clone() for n in self.names} if self.rule == "sr" else None
         self._write()

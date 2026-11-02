@@ -161,19 +161,18 @@ function render() {
   const runs = runsFor(st.model, st.lr), g = st.grid;
   const main = document.getElementById("main"); main.innerHTML = "";
   if (!runs.length) { main.innerHTML = '<div class="card w12 empty">no phase 1 runs for this selection yet</div>'; return; }
-  const plain = runs.find(r => r.config.variant === "plain"), qurl = runs.find(r => r.config.variant === "qurl");
-  const merged = (field) => Object.assign({}, plain ? series(plain, g, field) : {}, qurl ? series(qurl, g, field) : {});
+  const merged = (field) => Object.assign({}, ...runs.map(r => series(r, g, field)));
   const ch = merged("changed_frac"), re = merged("realized"), te = merged("track_err");
   const last = k => (ch[k] || []).slice(1).map(p => p[1]);
   const mean = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : NaN;
-  const steps = plain ? plain.steps.length : 0;
+  const steps = runs[0].steps.length;
   const kl50 = klAt(runs, Math.max(...runs.flatMap(r => r.kl.map(k => k.step))));
   const kl0 = klAt(LAG.filter(r => r.config.model === st.model), 0);
   // tiles
   main.appendChild(tile(`rtn ${g} changed / step`, (100 * mean(last(g + "/rtn"))).toFixed(3) + "%", `mean over steps 2-${steps}, ${st.lr.toExponential(0)}`));
   main.appendChild(tile(`ef ${g} changed / step`, (100 * mean(last(g + "/ef"))).toFixed(2) + "%", "error feedback re-rounds every sync"));
   const kr = kl50[g + "/rtn"] && kl50[g + "/ef"] ? kl50[g + "/rtn"] / kl50[g + "/ef"] : NaN;
-  main.appendChild(tile(`kl ratio rtn / ef`, isNaN(kr) ? "-" : kr.toFixed(2) + "x", `served vs master on ${plain ? plain.config.kl_n : "?"} held-out prompts`));
+  main.appendChild(tile(`kl ratio rtn / ef`, isNaN(kr) ? "-" : kr.toFixed(2) + "x", `served vs master on ${runs[0].config.kl_n} held-out prompts`));
   const gr = GRPO.filter(r => r.evals.length);
   main.appendChild(tile("grpo runs", GRPO.length, gr.length ? `${gr.length} with held-out eval` : "phase 2 pending"));
   // panels
