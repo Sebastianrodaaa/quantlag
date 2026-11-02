@@ -43,16 +43,21 @@ phase2:
 	  $(PY) -m quantlag.grpo --arm $$arm --seed 0 --steps 0 --eval-at 0 --eval-n $(P2_EVAL_N) --out results/grpo_step0_$$arm.json 2>&1 \
 	    | grep --line-buffered -v -i warn | tee results/logs/grpo_step0_$$arm.log; done
 
-# Qwen phase 1 as run for the committed results: one process per grid (and the QuRL variant on its own)
-# so a replay fits in memory next to a phase 2 run. Same seed and data order, so every process replays
-# the same AdamW trajectory (the logged losses match).
+# Qwen phase 1 as run for the committed results: train once per lr and variant, saving the master after
+# every step (`--dump`), then replay that trajectory through one grid at a time (`--replay`), so the
+# replay fits in memory next to a phase 2 run. Finished pieces are skipped, so it can be rerun after a kill.
 QWEN ?= Qwen/Qwen2.5-0.5B-Instruct
 QWEN_STEPS ?= 30
+LAG_Q = $(PY) -m quantlag.lag --model $(QWEN) --micro 1 --steps $(QWEN_STEPS) --kl-n $(KL_N)
 lag-split:
 	mkdir -p results/logs
-	for lr in $(LRS); do kl=$(QWEN_STEPS); [ $$lr = 1e-6 ] && kl=0,$(QWEN_STEPS); \
-	  for g in bf16 int8 int4; do \
-	    $(PY) -m quantlag.lag --model $(QWEN) --variant plain --grids $$g --micro 1 --steps $(QWEN_STEPS) --lr $$lr --kl-at $$kl --kl-n $(KL_N) 2>&1 \
-	      | grep --line-buffered -v -i warn | tee results/logs/lag_$$(basename $(QWEN))_plain_lr$${lr}_$$g.log || exit 1; done; \
-	  $(PY) -m quantlag.lag --model $(QWEN) --variant qurl --micro 1 --steps $(QWEN_STEPS) --lr $$lr --kl-at $$kl --kl-n $(KL_N) 2>&1 \
-	    | grep --line-buffered -v -i warn | tee results/logs/lag_$$(basename $(QWEN))_qurl_lr$$lr.log || exit 1; done
+	for v in plain qurl; do for lr in $(LRS); do kl=$(QWEN_STEPS); [ $$lr = 1e-6 ] && kl=0,$(QWEN_STEPS); \
+	  d=results/traj_$${v}_lr$$lr; [ $$v = plain ] && gs="bf16 int8 int4" || gs="bf16,int8,int4"; \
+	  for g in $$gs; do o=results/lag_$$(basename $(QWEN))_$${v}_lr$${lr}_$$(echo $$g | tr , -).json; \
+	    grep -qs wall_s $$o && continue; \
+	    grep -qs wall_s $$d/train.json || $(LAG_Q) --variant $$v --lr $$lr --grids "" --kl-at "" --dump $$d 2>&1 \
+	      | grep --line-buffered -v -i warn > results/logs/lag_$$(basename $(QWEN))_$${v}_lr$${lr}_train.log; \
+	    grep -qs wall_s $$d/train.json || exit 1; \
+	    $(LAG_Q) --variant $$v --lr $$lr --grids $$g --kl-at $$kl --replay $$d --out $$o 2>&1 \
+	      | grep --line-buffered -v -i warn > results/logs/lag_$$(basename $(QWEN))_$${v}_lr$${lr}_$$(echo $$g | tr , -).log; \
+	  done; [ $$(grep -ls wall_s results/lag_$$(basename $(QWEN))_$${v}_lr$${lr}_*.json | wc -l) = $$(echo $$gs | wc -w) ] && rm -rf $$d; done; done
