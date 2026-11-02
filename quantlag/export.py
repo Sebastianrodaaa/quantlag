@@ -9,7 +9,7 @@ followed by rtn export.
 import torch
 
 GRIDS = ("bf16", "int8", "int4")
-RULES = ("rtn", "sr", "ef", "efm")
+RULES = ("rtn", "sr", "ef")
 QMAX = {"int8": 127, "int4": 7}
 GROUP = 32  # int4 group size along the input dimension
 
@@ -63,13 +63,12 @@ class Served:
       rtn: re-quantize the master to the nearest grid point (the usual export).
       sr:  add the master's update since the last sync with stochastic rounding,
            so E[served] moves by exactly the update (low churn on any grid).
-      ef:  error feedback on the update: round served + update + residual of the
-           previous export, residual starting at 0, |residual| <= half a step, so
-           served - served0 tracks master - master0 to within half a step.
-      efm: error feedback on the whole master (Fair Cast's form): round master +
-           residual, residual starting at the snapshot's quantization error. Same
-           as ef on bf16 (the master starts on-grid); on int grids the off-grid
-           master makes the copy dither between neighbouring codes.
+      ef:  error feedback (Fair Cast) on the update: round x + residual, where
+           x = served0 + (master - master0) and residual = what the last rounding
+           lost (|residual| <= half a step), so the time average of the served copy
+           follows x. On bf16 x is the master itself. On int grids the shift by the
+           snapshot's quantization error keeps the copy from paying that error back
+           by dithering (unshifted, about half the int8 weights flip every sync).
     """
 
     def __init__(self, master, grid, rule, seed=0):
@@ -78,16 +77,17 @@ class Served:
         self.scale = frozen_scale(master, grid)
         self.gen = torch.Generator().manual_seed(seed)
         self.codes = quantize(master, grid, self.scale)
-        self.residual = {"ef": torch.zeros_like(master), "efm": master - self.weight()}.get(rule)
+        self.residual = torch.zeros_like(master) if rule == "ef" else None
+        self.offset = self.weight() - master if rule == "ef" and grid != "bf16" else 0
 
     def sync(self, master, delta=None):
-        """Export after a master update; `delta` (master minus master at the last sync) is used by sr and ef."""
+        """Export after a master update; `delta` (master minus master at the last sync) is used by sr."""
         if self.rule == "rtn":
             codes = quantize(master, self.grid, self.scale)
         elif self.rule == "sr":
             codes = quantize(self.weight() + delta, self.grid, self.scale, "sr", self.gen)
         else:
-            target = (self.weight() + delta if self.rule == "ef" else master) + self.residual
+            target = master + self.offset + self.residual
             codes = quantize(target, self.grid, self.scale)
             self.residual = target - dequant(codes, self.grid, self.scale)
             if self.scale is not None:  # no windup where the frozen absmax clamps: keep |residual| <= half a step

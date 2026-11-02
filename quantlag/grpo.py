@@ -65,7 +65,7 @@ class Policy:
         self.served = {n: Served(params[n].detach(), grid, self.rule, seed=seed + i) for i, n in enumerate(self.names)}
         self.master0 = {n: snapshot(params[n]) for n in self.names}
         # only sr exports the update itself, so only sr needs the master at the last sync
-        self.prev = {n: params[n].detach().clone() for n in self.names} if self.rule in ("sr", "ef") else None
+        self.prev = {n: params[n].detach().clone() for n in self.names} if self.rule == "sr" else None
         self._write()
 
     @torch.no_grad()

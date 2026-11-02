@@ -68,7 +68,7 @@ def main():
         invariant_scale(model, 1.5)
     names = quantized_names(model)
     P = dict(model.named_parameters())
-    rules = ["rtn"] if a.variant == "qurl" else ["rtn", "sr", "ef", "efm"]
+    rules = ["rtn"] if a.variant == "qurl" else ["rtn", "sr", "ef"]
     copies = {(g, r): {n: Served(P[n].detach(), g, r, seed=a.seed * 7919 + i) for i, n in enumerate(names)}
               for g in a.grids.split(",") for r in rules}
     master0 = {n: snapshot(P[n]) for n in names}
