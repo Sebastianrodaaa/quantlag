@@ -6,7 +6,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 OUT = "docs/screenshots"
-STY = {"rtn": ("#ffffff", "-"), "sr": ("#9a9a9a", "--"), "ef": ("#d0d0d0", ":"), "qurl": ("#6a6a6a", "-."), "fp32": ("#ffffff", (0, (2, 2)))}
+STY = {"rtn": ("#ffffff", "-"), "sr": ("#9a9a9a", "--"), "ef": ("#d0d0d0", ":"), "efm": ("#bdbdbd", (0, (5, 1, 1, 1))), "qurl": ("#6a6a6a", "-."), "fp32": ("#ffffff", (0, (2, 2)))}
 plt.rcParams.update({"figure.facecolor": "#000", "axes.facecolor": "#0b0b0b", "axes.edgecolor": "#333", "axes.labelcolor": "#bbb",
                      "xtick.color": "#888", "ytick.color": "#888", "text.color": "#ddd", "grid.color": "#1d1d1d", "font.family": "monospace",
                      "font.size": 9, "axes.grid": True, "legend.frameon": False, "savefig.facecolor": "#000"})
@@ -68,7 +68,7 @@ def fig_kl(lag, models, path):
             if r["config"]["model"] == m:
                 floor.update(next((k for k in r["kl"] if k["step"] == 0), {}))
         for ax, g in zip(axes[i], ["bf16", "int8", "int4"]):
-            rules = ["rtn", "sr", "ef", "qurl"]
+            rules = ["rtn", "sr", "ef", "efm", "qurl"]
             w = 0.8 / (len(rules) + 1)
             for j, rule in enumerate(rules + ["stuck"]):
                 vals = [last_kl(lag_runs(lag, m, lr)).get("stuck" if rule == "stuck" else f"{g}/{rule}", np.nan) for lr in lrs]

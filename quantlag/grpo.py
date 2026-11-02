@@ -65,7 +65,7 @@ class Policy:
         self.served = {n: Served(params[n].detach(), grid, self.rule, seed=seed + i) for i, n in enumerate(self.names)}
         self.master0 = {n: snapshot(params[n]) for n in self.names}
         # only sr exports the update itself, so only sr needs the master at the last sync
-        self.prev = {n: params[n].detach().clone() for n in self.names} if self.rule == "sr" else None
+        self.prev = {n: params[n].detach().clone() for n in self.names} if self.rule in ("sr", "ef") else None
         self._write()
 
     @torch.no_grad()
@@ -121,9 +121,10 @@ def evaluate(model, tok, test, n, max_new=256):
     rows = test.select(range(n))
     texts = prompts(tok, rows["question"])
     done = 0
+    golds = iter(rows["answer"])
     for _, _, comp in generate(model, tok, texts, max_new, sample=False):
-        for j, c in enumerate(tok.batch_decode(comp, skip_special_tokens=True)):
-            done += correct(c, gold(rows["answer"][done]))
+        for c in tok.batch_decode(comp, skip_special_tokens=True):
+            done += correct(c, gold(next(golds)))
     return done / n
 
 

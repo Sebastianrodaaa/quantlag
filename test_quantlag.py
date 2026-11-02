@@ -45,15 +45,15 @@ def test_sr_sync_tracks_small_updates():
 
 
 def test_ef_residual_bounded():
-    for grid in GRIDS:
-        s = Served(W, grid, "ef")
+    for grid, rule in [(g, r) for g in GRIDS for r in ("ef", "efm")]:
+        s = Served(W, grid, rule)
         w = W.clone()
         for t in range(20):
             d = 1e-4 * torch.randn_like(w)
             w += d
-            target = w + s.residual
+            target = (s.weight() + d if rule == "ef" else w) + s.residual
             s.sync(w, d)
-            assert (s.residual.abs() <= 0.5 * (1 + 1e-5) * step_size(target, grid, s.scale)).all(), grid  # 1e-5: fp32 rounding
+            assert (s.residual.abs() <= 0.5 * (1 + 1e-5) * step_size(target, grid, s.scale)).all(), (grid, rule)  # 1e-5: fp32 rounding
 
 
 def test_rtn_drops_sub_half_step_update():
