@@ -80,7 +80,8 @@ def fig_kl(lag, models, path):
             ax.set_title(f"{short(m)} / {g}", color="#ddd")
         axes[i][0].set_ylabel("KL(master || served) / token")
     axes[0][-1].legend(fontsize=7, ncol=2)
-    fig.suptitle("served vs master KL at the last step on 200 held-out GSM8K test problems", color="#ccc", fontsize=10)
+    n = sorted({r["config"]["kl_n"] for r in lag})
+    fig.suptitle(f"served vs master KL at the last step on {'/'.join(map(str, n))} held-out GSM8K test problems", color="#ccc", fontsize=10)
     fig.tight_layout(); fig.savefig(path, dpi=130); plt.close(fig)
 
 
