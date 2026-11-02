@@ -98,6 +98,12 @@ class Served:
         return dequant(self.codes, self.grid, self.scale)
 
 
+def snapshot(w):
+    """Copy of w, stored as bf16 when that is lossless (bf16 checkpoints), to halve its memory."""
+    b = w.detach().to(torch.bfloat16)
+    return b if torch.equal(b.float(), w) else w.detach().clone()
+
+
 def quantized_names(model):
     """The 2-D linear weights inside transformer blocks: the tensors a CPU int8/int4 runtime quantizes.
     ponytail: embeddings/lm_head, norms and biases are served in fp32."""

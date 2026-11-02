@@ -10,7 +10,7 @@ import torch
 from torch.func import functional_call
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from datasets import load_dataset
-from quantlag.export import GRIDS, Served, quantize, dequant, quantized_names, invariant_scale
+from quantlag.export import GRIDS, Served, quantize, dequant, quantized_names, invariant_scale, snapshot
 from quantlag.grpo import SUFFIX, cpu_name
 
 
@@ -71,7 +71,7 @@ def main():
     rules = ["rtn"] if a.variant == "qurl" else ["rtn", "sr", "ef"]
     copies = {(g, r): {n: Served(P[n].detach(), g, r, seed=a.seed * 7919 + i) for i, n in enumerate(names)}
               for g in a.grids.split(",") for r in rules}
-    master0 = {n: P[n].detach().clone() for n in names}
+    master0 = {n: snapshot(P[n]) for n in names}
     prev = {n: P[n].detach().clone() for n in names}
     order = random.Random(a.seed).sample(range(len(ds["train"])), a.steps * a.batch)
     test = ds["test"]
@@ -83,7 +83,8 @@ def main():
     key = lambda k: f"{k[0]}/{'qurl' if a.variant == 'qurl' else k[1]}"
     log = {"config": vars(a), "cpu": cpu_name(), "torch": torch.__version__, "threads": torch.get_num_threads(),
            "n_quantized": sum(P[n].numel() for n in names), "steps": [], "kl": []}
-    out = a.out or f"results/lag_{a.model.split('/')[-1]}_{a.variant}_lr{a.lr:g}.json"
+    split = "" if a.grids == ",".join(GRIDS) else "_" + a.grids.replace(",", "-")
+    out = a.out or f"results/lag_{a.model.split('/')[-1]}_{a.variant}_lr{a.lr:g}{split}.json"
     os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
 
     def save():
@@ -105,7 +106,7 @@ def main():
                 lp_s = logprobs(model, x, am, over)[m]
                 sums[key(k)] += float((pm.exp() * (pm - lp_s)).sum(-1).double().sum())
                 del over, lp_s
-            lp_s = logprobs(model, x, am, master0)[m]
+            lp_s = logprobs(model, x, am, {n: w.float() for n, w in master0.items()})[m]
             sums["stuck"] += float((pm.exp() * (pm - lp_s)).sum(-1).double().sum())
         rec = {"step": step, "tokens": ntok, "t": time.time() - t, **{k: v / ntok for k, v in sums.items()}}
         log["kl"].append(rec)

@@ -40,3 +40,17 @@ phase2:
 	for arm in fp32 rtn qurl; do \
 	  $(PY) -m quantlag.grpo --arm $$arm --seed 0 --steps 0 --eval-at 0 --eval-n $(P2_EVAL_N) --out results/grpo_step0_$$arm.json 2>&1 \
 	    | grep --line-buffered -v -i warn | tee results/logs/grpo_step0_$$arm.log; done
+
+# Qwen phase 1 as run for the committed results: one process per grid (and the QuRL variant on its own)
+# so a replay fits in memory next to a phase 2 run. Same seed and data order, so every process replays
+# the same AdamW trajectory (the logged losses match).
+QWEN ?= Qwen/Qwen2.5-0.5B-Instruct
+QWEN_STEPS ?= 30
+lag-split:
+	mkdir -p results/logs
+	for lr in $(LRS); do kl=$(QWEN_STEPS); [ $$lr = 1e-6 ] && kl=0,$(QWEN_STEPS); \
+	  for g in bf16 int8 int4; do \
+	    $(PY) -m quantlag.lag --model $(QWEN) --variant plain --grids $$g --micro 1 --steps $(QWEN_STEPS) --lr $$lr --kl-at $$kl --kl-n $(KL_N) 2>&1 \
+	      | grep --line-buffered -v -i warn | tee results/logs/lag_$$(basename $(QWEN))_plain_lr$${lr}_$$g.log || exit 1; done; \
+	  $(PY) -m quantlag.lag --model $(QWEN) --variant qurl --micro 1 --steps $(QWEN_STEPS) --lr $$lr --kl-at $$kl --kl-n $(KL_N) 2>&1 \
+	    | grep --line-buffered -v -i warn | tee results/logs/lag_$$(basename $(QWEN))_qurl_lr$$lr.log || exit 1; done
