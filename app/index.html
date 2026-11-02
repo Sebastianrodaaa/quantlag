@@ -102,7 +102,7 @@ function barChart(rows, {log=true, h=170} = {}) {  // rows: [{label, value, colo
 }
 
 function scatter(points, {h=190} = {}) {  // points: [{x, y, label, color}] log-log
-  const W = 520, H = h, L = 46, R = 10, T = 10, B = 22;
+  const W = 1040, H = h, L = 46, R = 10, T = 10, B = 22;
   const P = points.filter(p => p.x > 0 && p.y > 0);
   if (!P.length) return document.createTextNode("no data");
   const lx = P.map(p => Math.log10(p.x)), ly = P.map(p => Math.log10(p.y));
@@ -111,10 +111,13 @@ function scatter(points, {h=190} = {}) {  // points: [{x, y, label, color}] log-
   const svg = el("svg", {viewBox: `0 0 ${W} ${H}`});
   for (let t = y0; t <= y1; t++) { svg.appendChild(el("line", {x1: L, x2: W - R, y1: Y(10 ** t), y2: Y(10 ** t), stroke: "#1c1c1c"})); const tx = el("text", {x: L - 4, y: Y(10 ** t) + 3, "text-anchor": "end"}); tx.textContent = "1e" + t; svg.appendChild(tx); }
   for (let t = x0; t <= x1; t++) { svg.appendChild(el("line", {x1: X(10 ** t), x2: X(10 ** t), y1: T, y2: H - B, stroke: "#151515"})); const tx = el("text", {x: X(10 ** t), y: H - 8, "text-anchor": "middle"}); tx.textContent = "1e" + t; svg.appendChild(tx); }
+  const placed = [];
   P.forEach(p => {
     svg.appendChild(el("circle", {cx: X(p.x), cy: Y(p.y), r: 9, fill: p.color, opacity: .08}));
     svg.appendChild(el("circle", {cx: X(p.x), cy: Y(p.y), r: 3, fill: p.color}));
-    const tx = el("text", {x: X(p.x) + 6, y: Y(p.y) - 5}); tx.textContent = p.label; svg.appendChild(tx);
+    if (placed.some(q => Math.abs(q[0] - X(p.x)) < 90 && Math.abs(q[1] - Y(p.y)) < 12)) return;  // label only uncrowded dots
+    placed.push([X(p.x), Y(p.y)]);
+    const right = X(p.x) > W - 140, tx = el("text", {x: X(p.x) + (right ? -6 : 6), y: Y(p.y) - 5, "text-anchor": right ? "end" : "start"}); tx.textContent = p.label; svg.appendChild(tx);
   });
   return svg;
 }
@@ -170,7 +173,7 @@ function render() {
   const kl0 = klAt(LAG.filter(r => r.config.model === st.model), 0);
   // tiles
   main.appendChild(tile(`rtn ${g} changed / step`, (100 * mean(last(g + "/rtn"))).toFixed(3) + "%", `mean over steps 2-${steps}, ${st.lr.toExponential(0)}`));
-  main.appendChild(tile(`ef ${g} changed / step`, (100 * mean(last(g + "/ef"))).toFixed(2) + "%", "error feedback re-rounds every sync"));
+  main.appendChild(tile(`ef ${g} changed / step`, (100 * mean(last(g + "/ef"))).toFixed(3) + "%", "error feedback re-rounds every sync"));
   const kr = kl50[g + "/rtn"] && kl50[g + "/ef"] ? kl50[g + "/rtn"] / kl50[g + "/ef"] : NaN;
   main.appendChild(tile(`kl ratio rtn / ef`, isNaN(kr) ? "-" : kr.toFixed(2) + "x", `served vs master on ${runs[0].config.kl_n} held-out prompts`));
   const gr = GRPO.filter(r => r.evals.length);
@@ -178,7 +181,7 @@ function render() {
   // panels
   const keys = Object.keys(ch).sort((a, b) => RULES.indexOf(ruleOf(a)) - RULES.indexOf(ruleOf(b)));
   const sty = k => ({color: STYLE[ruleOf(k)][0], dash: STYLE[ruleOf(k)][1]});
-  main.appendChild(card("w8", "served weights changed per step", `${st.model.split("/")[1]} / ${g} / lr ${st.lr}`, "fraction of block linear weights whose served code changed at each sync (log scale)",
+  main.appendChild(card("w8", "served weights changed per step", `${st.model.split("/")[1]} / ${g} / lr ${st.lr.toExponential(0)}`, "fraction of block linear weights whose served code changed at each sync (log scale)",
     [lineChart(keys.map(k => ({...sty(k), pts: ch[k].slice(1)})), {log: true}), legend(keys.map(ruleOf))]));
   const klRows = keys.map(k => ({label: ruleOf(k), value: kl50[k] || 0, color: STYLE[ruleOf(k)][0]}));
   klRows.push({label: "stuck", value: kl50.stuck || 0, color: "#444"});
@@ -205,17 +208,28 @@ function render() {
   tbl.innerHTML = "<tr><th>arm</th><th>step</th><th>runs</th><th>acc</th><th>± sd</th><th>n</th></tr>" + accRows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${(100 * r[3]).toFixed(1)}%</td><td>${isNaN(r[4]) ? "-" : (100 * r[4]).toFixed(1)}</td><td>${r[5]}</td></tr>`).join("");
   main.appendChild(card("w6", "held-out gsm8k accuracy", "greedy, 256 new tokens", "test split, first n problems; step 0 is shared where the served weights are identical", accRows.length ? tbl : document.createTextNode("phase 2 pending")));
   const wall = document.createElement("table");
-  wall.innerHTML = "<tr><th>run</th><th>steps</th><th>s / step</th><th>wall</th></tr>" + [...LAG, ...GRPO].map(r => { const n = r.steps.length, w = r.wall_s; const name = r.config.arm ? `grpo ${r.config.arm} s${r.config.seed}` : `lag ${r.config.model.split("/")[1].split("-")[0]} ${r.config.variant} ${r.config.lr}`;
+  wall.innerHTML = "<tr><th>run</th><th>steps</th><th>s / step</th><th>wall</th></tr>" + [...LAG, ...GRPO].map(r => { const n = r.steps.length, w = r.wall_s; const name = r.config.arm ? `grpo ${r.config.arm} s${r.config.seed}` : `lag ${r.config.model.split("/")[1].split("-")[0]} ${r.config.variant} ${r.config.lr.toExponential(0)}`;
     const per = mean(r.steps.map(s => (s.t_gen || 0) + (s.t_train || 0) + (s.t_sync || 0))); return `<tr><td>${name}</td><td>${n}</td><td>${per.toFixed(1)}</td><td>${w ? (w / 3600).toFixed(2) + " h" : "running"}</td></tr>`; }).join("");
   main.appendChild(card("w12", "runs", "", "every run on this machine, read from results/*.json", wall));
   const any = LAG[0] || GRPO[0];
   document.getElementById("meta").textContent = any ? `cpu\n${any.cpu}\ntorch ${any.torch}, ${any.threads} threads\n\n${LAG.length} phase 1 runs\n${GRPO.length} phase 2 runs` : "";
 }
+function mergeLag(runs) {  // Qwen phase 1 replays one trajectory per grid into separate files; join them per (model, variant, lr)
+  const by = {};
+  for (const r of runs) {
+    const id = [r.config.model, r.config.variant, r.config.lr].join("|"), m = by[id];
+    if (!m) { by[id] = r; continue; }
+    r.steps.forEach((s, i) => Object.assign(m.steps[i].exports, s.exports));
+    r.kl.forEach(k => { const o = m.kl.find(q => q.step === k.step); o ? Object.assign(o, k) : m.kl.push(k); });
+    m.wall_s = m.wall_s && r.wall_s ? m.wall_s + r.wall_s : undefined;
+  }
+  return Object.values(by);
+}
 function smooth(p, k = 3) { return p.map((q, i) => [q[0], p.slice(Math.max(0, i - k + 1), i + 1).reduce((a, b) => a + b[1], 0) / Math.min(k, i + 1)]); }
 
 fetch("../results/manifest.json").then(r => r.json()).then(async files => {
   const all = (await Promise.all(files.map(f => fetch("../results/" + f).then(r => r.ok ? r.json() : null).then(d => d && (d.file = f, d)).catch(() => null)))).filter(Boolean);
-  LAG = all.filter(d => d.file.startsWith("lag_")); GRPO = all.filter(d => d.file.startsWith("grpo_"));
+  LAG = mergeLag(all.filter(d => d.file.startsWith("lag_"))); GRPO = all.filter(d => d.file.startsWith("grpo_"));
   render();
 }).catch(e => { document.getElementById("main").innerHTML = `<div class="card w12 empty">could not read results/manifest.json (${e}). serve the repo root: python3 -m http.server 8000, then open /app/</div>`; });
 </script>
