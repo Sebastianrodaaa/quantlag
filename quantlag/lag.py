@@ -4,6 +4,9 @@ update reaches the served copy, per grid (bf16/int8/int4) and export rule.
 The master trains on its own loss (a replay of real updates); every export
 rule watches the same master trajectory. `--variant qurl` reparametrises the
 model with QuRL invariant scaling first and exports with round-to-nearest.
+`--dump DIR --grids ""` trains only and saves the master after every step;
+`--replay DIR` then runs the exports on that trajectory without an optimizer,
+so a large model's grids can be measured one at a time in less memory.
 """
 import argparse, json, math, os, random, re, time
 import torch
@@ -59,6 +62,8 @@ def main():
     ap.add_argument("--micro", type=int, default=2)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--out", default="")
+    ap.add_argument("--dump", default="")
+    ap.add_argument("--replay", default="")
     a = ap.parse_args()
     torch.manual_seed(a.seed)
     tok = AutoTokenizer.from_pretrained(a.model)
@@ -70,9 +75,9 @@ def main():
     P = dict(model.named_parameters())
     rules = ["rtn"] if a.variant == "qurl" else ["rtn", "sr", "ef"]
     copies = {(g, r): {n: Served(P[n].detach(), g, r, seed=a.seed * 7919 + i) for i, n in enumerate(names)}
-              for g in a.grids.split(",") for r in rules}
-    master0 = {n: snapshot(P[n]) for n in names}
-    prev = {n: P[n].detach().clone() for n in names}
+              for g in a.grids.split(",") if g for r in rules}
+    master0 = {n: snapshot(P[n]) for n in names} if copies else {}
+    prev = {n: P[n].detach().clone() for n in names} if copies else {}
     order = random.Random(a.seed).sample(range(len(ds["train"])), a.steps * a.batch)
     test = ds["test"]
     kl_rows = test.select(range(len(test) - a.kl_n, len(test)))
@@ -84,7 +89,7 @@ def main():
     log = {"config": vars(a), "cpu": cpu_name(), "torch": torch.__version__, "threads": torch.get_num_threads(),
            "n_quantized": sum(P[n].numel() for n in names), "steps": [], "kl": []}
     split = "" if a.grids == ",".join(GRIDS) else "_" + a.grids.replace(",", "-")
-    out = a.out or f"results/lag_{a.model.split('/')[-1]}_{a.variant}_lr{a.lr:g}{split}.json"
+    out = a.out or (f"{a.dump}/train.json" if a.dump else None) or f"results/lag_{a.model.split('/')[-1]}_{a.variant}_lr{a.lr:g}{split}.json"
     os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
 
     def save():
@@ -122,14 +127,21 @@ def main():
         x, am, rm = encode(tok, [sft_text(tok, q, ans) for q, ans in zip(rows["question"], rows["answer"])], a.max_len)
         t = time.time()
         ntok, loss = int(rm[:, 1:].sum()), 0.0
-        for i in range(0, len(x), a.micro):  # micro-batches: fp32 activations of 8 x 320 tokens do not fit next to the copies
+        for i in range(0 if not a.replay else len(x), len(x), a.micro):  # micro-batches: fp32 activations of 8 x 320 tokens do not fit next to the copies
             xi, mi = x[i:i + a.micro], rm[i:i + a.micro, 1:].bool()
             logits = model(input_ids=xi, attention_mask=am[i:i + a.micro]).logits[:, :-1]
             li = torch.nn.functional.cross_entropy(logits[mi], xi[:, 1:][mi], reduction="sum") / ntok
             li.backward(); loss += li.item()
             del logits, li
-        opt.step(); opt.zero_grad(set_to_none=True)
-        t_train = time.time() - t
+        if a.replay:
+            d = torch.load(f"{a.replay}/{step + 1}.pt")
+            model.load_state_dict(d["sd"]); loss, t_train = d["loss"], d["t_train"]
+            del d
+        else:
+            opt.step(); opt.zero_grad(set_to_none=True)
+            t_train = time.time() - t
+            if a.dump:
+                torch.save({"sd": model.state_dict(), "loss": loss, "t_train": t_train}, f"{a.dump}/{step + 1}.pt")
         t = time.time()
         rec = {"step": step + 1, "loss": loss, "t_train": t_train}
         with torch.no_grad():
@@ -146,7 +158,7 @@ def main():
                 upd[key(k)] = {"changed_frac": changed / log["n_quantized"], "realized": num / max(den, 1e-30),
                                "track_err": math.sqrt(err / max(den, 1e-30))}
             rec["exports"] = upd
-            for n in names:
+            for n in prev:
                 prev[n].copy_(P[n])
         rec["t_sync"] = time.time() - t
         log["steps"].append(rec)
