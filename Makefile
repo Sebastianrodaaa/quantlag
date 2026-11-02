@@ -39,7 +39,7 @@ phase2:
 	  [ -f results/grpo_$${arm}_int8_s$$s.json ] && grep -q wall_s results/grpo_$${arm}_int8_s$$s.json && continue; \
 	  $(PY) -m quantlag.grpo --arm $$arm --seed $$s --lr $(P2_LR) --steps $(P2_STEPS) --eval-at $(P2_STEPS) --eval-n $(P2_EVAL_N) 2>&1 \
 	    | grep --line-buffered -v -i warn | tee results/logs/grpo_$${arm}_s$$s.log || exit 1; done; done
-	for arm in fp32 rtn qurl; do \
+	for arm in fp32 rtn qurl; do grep -qs wall_s results/grpo_step0_$$arm.json && continue; \
 	  $(PY) -m quantlag.grpo --arm $$arm --seed 0 --steps 0 --eval-at 0 --eval-n $(P2_EVAL_N) --out results/grpo_step0_$$arm.json 2>&1 \
 	    | grep --line-buffered -v -i warn | tee results/logs/grpo_step0_$$arm.log; done
 
