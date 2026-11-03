@@ -1,5 +1,4 @@
 __pycache__/
 *.pyc
 *.tmp
-results/timing/
 results/traj_*/

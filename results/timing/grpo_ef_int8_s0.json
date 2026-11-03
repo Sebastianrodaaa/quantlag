@@ -1,0 +1,62 @@
+{
+ "config": {
+  "model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "arm": "ef",
+  "grid": "int8",
+  "seed": 0,
+  "steps": 3,
+  "lr": 1e-06,
+  "prompts": 8,
+  "samples": 4,
+  "max_new": 256,
+  "eval_at": "",
+  "eval_n": 500,
+  "out": "results/timing/grpo_ef_int8_s0.json"
+ },
+ "cpu": "Intel(R) Xeon(R) Processor x8",
+ "torch": "2.14.1+cpu",
+ "threads": 8,
+ "steps": [
+  {
+   "step": 1,
+   "reward": 0.1875,
+   "trained_seqs": 8,
+   "resp_len": 246.96875,
+   "grad_norm": 1.6753793954849243,
+   "t_gen": 127.72010231018066,
+   "t_train": 26.991031885147095,
+   "t_sync": 2.0070414543151855,
+   "changed_frac": 0.4989775577307621,
+   "realized": 1.8703332277684654,
+   "track_err": 492.6892427019437
+  },
+  {
+   "step": 2,
+   "reward": 0.0625,
+   "trained_seqs": 4,
+   "resp_len": 248.3125,
+   "grad_norm": 0.8183140158653259,
+   "t_gen": 113.6953592300415,
+   "t_train": 10.444067478179932,
+   "t_sync": 0.6560811996459961,
+   "changed_frac": 0.6637686704977964,
+   "realized": 0.6905401881743227,
+   "track_err": 184.1554324445967
+  },
+  {
+   "step": 3,
+   "reward": 0.15625,
+   "trained_seqs": 16,
+   "resp_len": 249.4375,
+   "grad_norm": 2.3721625804901123,
+   "t_gen": 102.5852301120758,
+   "t_train": 57.15209460258484,
+   "t_sync": 0.5652930736541748,
+   "changed_frac": 0.4997117486192193,
+   "realized": 1.0511500682628845,
+   "track_err": 203.57909875871871
+  }
+ ],
+ "evals": [],
+ "wall_s": 441.9548852443695
+}
