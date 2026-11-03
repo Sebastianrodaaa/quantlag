@@ -115,9 +115,10 @@ function scatter(points, {h=190} = {}) {  // points: [{x, y, label, color}] log-
   P.forEach(p => {
     svg.appendChild(el("circle", {cx: X(p.x), cy: Y(p.y), r: 9, fill: p.color, opacity: .08}));
     svg.appendChild(el("circle", {cx: X(p.x), cy: Y(p.y), r: 3, fill: p.color}));
-    if (placed.some(q => Math.abs(q[0] - X(p.x)) < 90 && Math.abs(q[1] - Y(p.y)) < 12)) return;  // label only uncrowded dots
-    placed.push([X(p.x), Y(p.y)]);
-    const right = X(p.x) > W - 140, tx = el("text", {x: X(p.x) + (right ? -6 : 6), y: Y(p.y) - 5, "text-anchor": right ? "end" : "start"}); tx.textContent = p.label; svg.appendChild(tx);
+    const right = X(p.x) > W - 140, w = 6.5 * p.label.length, x = X(p.x) + (right ? -6 - w : 6), y = Y(p.y) - 5;
+    if (placed.some(q => x < q[0] + q[2] + 4 && q[0] < x + w + 4 && Math.abs(q[1] - y) < 12)) return;  // label only where its box is free
+    placed.push([x, y, w]);
+    const tx = el("text", {x, y}); tx.textContent = p.label; svg.appendChild(tx);
   });
   return svg;
 }
@@ -176,8 +177,7 @@ function render() {
   main.appendChild(tile(`ef ${g} changed / step`, (100 * mean(last(g + "/ef"))).toFixed(3) + "%", "error feedback re-rounds every sync"));
   const kr = kl50[g + "/rtn"] && kl50[g + "/ef"] ? kl50[g + "/rtn"] / kl50[g + "/ef"] : NaN;
   main.appendChild(tile(`kl ratio rtn / ef`, isNaN(kr) ? "-" : kr.toFixed(2) + "x", `served vs master on ${runs[0].config.kl_n} held-out prompts`));
-  const gr = GRPO.filter(r => r.evals.length);
-  main.appendChild(tile("grpo runs", GRPO.length, gr.length ? `${gr.length} with held-out eval` : "phase 2 pending"));
+  main.appendChild(tile("grpo runs", GRPO.length, GRPO.length ? `${GRPO.filter(r => r.steps.length).length} training + ${GRPO.filter(r => !r.steps.length).length} step-0 eval` : "phase 2 pending"));
   // panels
   const keys = Object.keys(ch).sort((a, b) => RULES.indexOf(ruleOf(a)) - RULES.indexOf(ruleOf(b)));
   const sty = k => ({color: STYLE[ruleOf(k)][0], dash: STYLE[ruleOf(k)][1]});
