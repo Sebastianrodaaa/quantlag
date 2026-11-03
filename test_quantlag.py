@@ -32,9 +32,9 @@ def test_sr_unbiased():
 
 
 def test_sr_sync_tracks_small_updates():
-    """Sub-half-step updates move the SR served copy by the update in expectation; RTN does not move."""
+    """Sub-half-step updates move the SR served copy by the update in expectation."""
     for grid in GRIDS:
-        sr, rtn = Served(W, grid, "sr", seed=2), Served(W, grid, "rtn")
+        sr = Served(W, grid, "sr", seed=2)
         base = sr.weight()
         d = 0.1 * step_size(W, grid, sr.scale) * torch.sign(torch.randn(W.shape, generator=torch.Generator().manual_seed(3)))
         w = W.clone()

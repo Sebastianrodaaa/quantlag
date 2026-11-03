@@ -38,14 +38,14 @@ All rules start from the same RTN snapshot `q0` of the initial master `w0`.
 |---|---|
 | `rtn` | `Q_rtn(w_t)`: re-quantize the master (the usual export) |
 | `sr` | `Q_sr(served + d)`: stochastic rounding of the update onto the grid, `E[served_t] = q0 + (w_t - w0)` |
-| `ef` | `Q_rtn(served + d + r)`, residual `r` keeps what did not fit, `abs(r) <= half a step` |
+| `ef` | `Q_rtn(w_t + (q0 - w0) + r)`, residual `r` keeps what did not fit, `abs(r) <= half a step` |
 | `qurl` | invariant scaling (below), then `rtn` |
 
 For bf16, `w0` is already on the grid (checkpoints are bf16), so `q0 = w0` and `sr`/`ef` are
 exactly Fair Cast's stochastic-rounding and error-feedback exports. For int8/int4 `w0` is not
-on the grid; re-rounding the whole master stochastically would add a fresh half-step of noise
-to every weight at every sync (we measured a third of all int8 codes flipping per sync with
-that variant before switching), so the unbiased rules here round the update, not the weight.
+on the grid; re-rounding the whole master stochastically, or feeding back its initial rounding
+error, would add up to a half step of fresh noise to every weight at every sync, so the
+unbiased rules here are applied to the movement away from `q0`, not to the weight itself.
 
 QuRL invariant scaling is implemented as a one-time reparameterization: in every block the
 two RMSNorm weights are multiplied by `s = 1.5` and the q/k/v/gate/up projections that read
@@ -58,7 +58,7 @@ implemented.
 ### Phase 1: replay (`quantlag/lag.py`)
 
 Real AdamW updates (`betas = (0.9, 0.99)`, no weight decay) from supervised fine-tuning on
-GSM8K train answers (batch 8, up to 320 tokens, 50 steps), at learning rates 1e-6, 3e-6 and
+GSM8K train answers (batch 8, up to 320 tokens; 50 steps on SmolLM2, 30 on Qwen), at learning rates 1e-6, 3e-6 and
 1e-5, on SmolLM2-135M-Instruct and Qwen2.5-0.5B-Instruct. The master trains on its own loss;
 every export rule watches the same master trajectory. Per step we log:
 
@@ -75,7 +75,7 @@ whose block weights never leave step 0 (the worst case of lag).
 
 Qwen2.5-0.5B-Instruct, GSM8K train, 8 prompts x 4 samples per step, temperature 1, up to 256
 new tokens, reward 1 if the last `\boxed{}` (or last number) equals the reference answer.
-Group-normalized advantages, sequence-mean log-prob loss, AdamW lr 1e-5, gradient clip 1.0.
+Group-normalized advantages, sequence-mean log-prob loss, AdamW lr 3e-6, gradient clip 1.0, 20 steps.
 Rollouts are sampled from the served int8 copy and the loss is computed on the same served
 weights with a straight-through estimator (`w_master + (w_served - w_master).detach()`), so the
 data and the loss come from one policy and gradients land on the fp32 master. The fp32 arm
@@ -99,8 +99,100 @@ samples and trains on the master directly. Held-out accuracy is greedy decoding 
 
 ## Results
 
-RESULTS_PLACEHOLDER
+Short answer: **the hypothesis fails for int8.** The bf16 lag that Fair Cast describes is
+reproduced, but an int8 or int4 copy made by RTN from fp32 masters does not lag in the same
+way, and error feedback, as implemented here, made the int8 copy worse in phase 1 and gave
+lower GSM8K accuracy in phase 2. Full tables: [results/summary.md](../results/summary.md).
+
+### Phase 1: export lag
+
+`realized` and KL at the last step (step 50 on SmolLM2, 30 on Qwen), `changed` = mean share
+of served block weights that change per sync from step 2 on.
+
+| model, lr | grid | rtn changed | rtn realized | rtn KL | sr KL | ef KL | qurl KL | stuck KL |
+|---|---|---|---|---|---|---|---|---|
+| SmolLM2, 1e-6 | bf16 | 0.23% | 0.07 | 0.070 | 9.5e-6 | 0.0016 | 0.064 | 0.085 |
+| SmolLM2, 1e-5 | bf16 | 1.26% | 0.33 | 0.067 | 4.4e-5 | 2.4e-5 | 0.011 | 0.227 |
+| Qwen, 1e-6 | bf16 | 1.24% | 0.22 | 0.060 | 2.5e-5 | 6.3e-5 | 0.0075 | 0.237 |
+| Qwen, 1e-5 | bf16 | 9.23% | 0.93 | 4.8e-4 | 1.1e-4 | 3.0e-5 | 8.5e-5 | 0.290 |
+| SmolLM2, 1e-6 | int8 | 0.0095% | 1.10 | 0.0022 | 0.0020 | 0.084 | 0.0021 | 0.085 |
+| SmolLM2, 1e-5 | int8 | 0.055% | 1.01 | 0.0015 | 0.0019 | 0.0023 | 0.0014 | 0.227 |
+| Qwen, 1e-6 | int8 | 0.050% | 1.03 | 0.0013 | 0.0015 | 0.013 | 0.0014 | 0.237 |
+| Qwen, 1e-5 | int8 | 0.43% | 1.00 | 0.0010 | 0.0021 | 0.0017 | 8.9e-4 | 0.290 |
+| SmolLM2, 1e-6 | int4 | 0.0029% | 4.16 | 0.37 | 0.25 | 0.28 | 0.35 | 0.085 |
+| Qwen, 1e-6 | int4 | 0.0070% | 1.69 | 0.12 | 0.13 | 0.38 | 0.12 | 0.237 |
+| Qwen, 1e-5 | int4 | 0.040% | 0.98 | 0.094 | 1.45 | 1.41 | 0.081 | 0.290 |
+
+What the numbers say:
+
+- **bf16 lags.** RTN serves 7-33% of the cumulative update on SmolLM2 and 22% on Qwen at lr
+  1e-6, and its KL to the master is about as large as never updating the served copy
+  (`stuck`). Stochastic rounding serves all of it (`realized` 1.00) at 3-4 orders of
+  magnitude lower KL. Error feedback also tracks (0.97-1.24) but rewrites 8-49% of the bf16
+  weights per sync. At lr 1e-5 on Qwen the updates are large enough that RTN keeps up.
+- **int8 does not lag.** Fewer than 1% of int8 weights change per sync, as the brief
+  predicted, yet RTN realizes 1.0-1.1 of the cumulative update at every learning rate, and
+  the int8 KL (about 1e-3) is the static quantization error, the same for RTN and SR and
+  40-300x below `stuck`. Our reading: a bf16 checkpoint sits exactly on the bf16 grid, so a
+  small update has to cross half a step before anything moves; an fp32 master quantized to
+  int8 sits at a uniformly spread position inside each cell, so its own rounding error acts
+  as a dither and RTN is close to unbiased across the tensor. This is an inference from the
+  measurements, not a proven property.
+- **EF on int8 hurts.** Defining EF on the movement away from the snapshot puts the target
+  back on the grid, which recreates a dead zone, and the residual then dithers between two
+  neighbours. EF had the highest int8 KL at lr 1e-6 on both models (0.084 and 0.013, against
+  0.002 and 0.001 for RTN) and changed 7x more Qwen weights per sync.
+- **int4 is dominated by the static error.** All rules sit at KL 0.1-0.4 (on SmolLM2 at lr 1e-6
+  more than `stuck`), so the export rule is not the first-order problem at 4 bits. SR and EF were
+  much worse than RTN on Qwen at lr 1e-5 (KL 1.4 vs 0.09).
+- **QuRL scaling** roughly matches RTN on int8 and int4 and reduces the bf16 lag (Qwen lr
+  1e-6: realized 0.55 vs 0.22, KL 0.0075 vs 0.060), still well short of SR.
+
+### Phase 2: GRPO with int8 rollouts
+
+Qwen2.5-0.5B-Instruct, 20 GRPO steps at lr 3e-6, greedy accuracy on the first 500 GSM8K
+test problems. Step 0 is the untrained policy on the same served weights (EF starts from the
+same RTN snapshot, so it shares the RTN step-0 number).
+
+| arm | seeds | step 0 | step 20, per seed | step 20, mean | int8 weights changed / step |
+|---|---|---|---|---|---|
+| fp32 reference | 1 | 28.8% | 44.0 | 44.0% | - |
+| int8 RTN | 3 | 31.2% | 43.8, 44.0, 38.6 | 42.1% | 0.11% |
+| int8 EF | 3 | 31.2% | 27.4, 23.6, 34.2 | 28.4% | 6.7-6.8% |
+| int8 QuRL | 3 | 30.8% | 39.0, 40.8, 37.4 | 39.1% | 0.14-0.15% |
+
+- RTN int8 trains about as well as the fp32 reference (42.1% over 3 seeds vs 44.0% on one
+  seed; the RTN seed range alone is 5.4 points). There is no lag for EF to fix.
+- EF finished every seed below RTN's worst seed and its mean is below the untrained step-0
+  accuracy. It rewrites about 7% of the int8 weights at every sync, 60x RTN's churn, because
+  the residual dithers each touched weight between two grid points; the rollouts then come
+  from a noisier policy than the one being optimized. The train reward shows the same order
+  (mean over steps: EF 0.21-0.32, RTN 0.34-0.38).
+- QuRL scaling lands between them, 3 points under RTN on average.
+- 20 steps, 32 rollouts per step and 3 seeds are a small-scale result: differences of a few
+  points between RTN, QuRL and fp32 are within seed noise; the EF gap (14 points between means,
+  no overlap) is not.
 
 ## Limitations
 
-LIMITS_PLACEHOLDER
+- **Small scale.** Two small models, one CPU, 50 (SmolLM2) or 30 (Qwen) phase-1 steps and
+  20 GRPO steps. GRPO accuracy after 20 steps measures early training only; nothing here
+  says what happens over thousands of steps.
+- **Held-out set.** Accuracy is on the first 500 GSM8K test problems, greedy, at step 20. The
+  brief's full 1,319-problem final evaluation was not run: one 500-problem eval took 10 to 50
+  minutes depending on host CPU steal time, and the seeds were the better use of the budget.
+- **Seeds.** GRPO noise between seeds is large at 32 rollouts per step; see the per-seed table.
+  Arms with fewer than three finished seeds are marked in the table.
+- **Phase 1 trajectory.** Phase 1 replays supervised AdamW updates on GSM8K answers, not GRPO
+  updates. Their size per step is comparable at the same learning rate, but their direction
+  is not RL.
+- **Frozen scales.** Integer scales never change. A weight that the master pushes past the
+  frozen absmax is clamped; re-computing scales would trade that for whole-channel churn.
+- **QuRL** is our reading of invariant scaling (one fixed `s = 1.5`, absorbed into RMSNorm),
+  without Adaptive Clipping Range, and without the authors' code.
+- **EF on integer grids** is defined on the movement away from the RTN snapshot (see
+  Method). The whole-master Fair Cast form was tried first and flipped about half the int8
+  weights every sync, so it was not used for the final runs.
+- **Host.** Timings in the JSON files were taken on a shared VM with 0-30% CPU steal time;
+  compare them within a run, not across runs.
+
