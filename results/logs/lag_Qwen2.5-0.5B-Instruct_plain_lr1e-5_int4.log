@@ -1,0 +1,32 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  66%|██████▌   | 192/290 [00:00<00:00, 1915.23it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1887.52it/s]
+{"step": 1, "loss": 0.8663, "t_train": 15.1, "t_sync": 5.4, "int4/rtn": 0.002711, "int4/sr": 0.001631, "int4/ef": 0.0}
+{"step": 2, "loss": 0.5331, "t_train": 13.9, "t_sync": 3.0, "int4/rtn": 0.000874, "int4/sr": 0.001034, "int4/ef": 0.0}
+{"step": 3, "loss": 0.6511, "t_train": 14.3, "t_sync": 2.6, "int4/rtn": 0.000775, "int4/sr": 0.0008, "int4/ef": 0.0}
+{"step": 4, "loss": 0.4957, "t_train": 12.4, "t_sync": 3.0, "int4/rtn": 0.000644, "int4/sr": 0.000668, "int4/ef": 0.0}
+{"step": 5, "loss": 0.6424, "t_train": 10.8, "t_sync": 2.8, "int4/rtn": 0.000582, "int4/sr": 0.000587, "int4/ef": 0.0}
+{"step": 6, "loss": 0.4747, "t_train": 12.4, "t_sync": 4.4, "int4/rtn": 0.000513, "int4/sr": 0.000525, "int4/ef": 0.0}
+{"step": 7, "loss": 0.5562, "t_train": 11.1, "t_sync": 4.8, "int4/rtn": 0.000479, "int4/sr": 0.000486, "int4/ef": 0.0}
+{"step": 8, "loss": 0.4847, "t_train": 13.9, "t_sync": 3.4, "int4/rtn": 0.000441, "int4/sr": 0.000449, "int4/ef": 1e-06}
+{"step": 9, "loss": 0.6642, "t_train": 13.6, "t_sync": 2.7, "int4/rtn": 0.000418, "int4/sr": 0.000426, "int4/ef": 2e-06}
+{"step": 10, "loss": 0.681, "t_train": 12.5, "t_sync": 2.5, "int4/rtn": 0.000406, "int4/sr": 0.000412, "int4/ef": 9e-06}
+{"step": 11, "loss": 0.7162, "t_train": 18.2, "t_sync": 2.5, "int4/rtn": 0.000407, "int4/sr": 0.000415, "int4/ef": 2.7e-05}
+{"step": 12, "loss": 0.479, "t_train": 13.7, "t_sync": 2.4, "int4/rtn": 0.000386, "int4/sr": 0.000393, "int4/ef": 6.3e-05}
+{"step": 13, "loss": 0.484, "t_train": 12.3, "t_sync": 3.0, "int4/rtn": 0.000365, "int4/sr": 0.000374, "int4/ef": 0.000119}
+{"step": 14, "loss": 0.578, "t_train": 10.9, "t_sync": 2.7, "int4/rtn": 0.000349, "int4/sr": 0.000357, "int4/ef": 0.000196}
+{"step": 15, "loss": 0.5384, "t_train": 14.0, "t_sync": 2.8, "int4/rtn": 0.000344, "int4/sr": 0.000354, "int4/ef": 0.000291}
+{"step": 16, "loss": 0.4883, "t_train": 13.9, "t_sync": 3.0, "int4/rtn": 0.000332, "int4/sr": 0.000336, "int4/ef": 0.000404}
+{"step": 17, "loss": 0.5158, "t_train": 12.1, "t_sync": 2.9, "int4/rtn": 0.000323, "int4/sr": 0.000331, "int4/ef": 0.000539}
+{"step": 18, "loss": 0.6487, "t_train": 11.6, "t_sync": 3.0, "int4/rtn": 0.000317, "int4/sr": 0.000323, "int4/ef": 0.000695}
+{"step": 19, "loss": 0.6099, "t_train": 32.4, "t_sync": 2.7, "int4/rtn": 0.000305, "int4/sr": 0.00031, "int4/ef": 0.000876}
+{"step": 20, "loss": 0.4915, "t_train": 17.7, "t_sync": 2.9, "int4/rtn": 0.000305, "int4/sr": 0.000311, "int4/ef": 0.001085}
+{"step": 21, "loss": 0.5138, "t_train": 22.5, "t_sync": 3.0, "int4/rtn": 0.000303, "int4/sr": 0.000309, "int4/ef": 0.001323}
+{"step": 22, "loss": 0.5582, "t_train": 15.7, "t_sync": 2.9, "int4/rtn": 0.000299, "int4/sr": 0.000303, "int4/ef": 0.001606}
+{"step": 23, "loss": 0.5258, "t_train": 17.6, "t_sync": 3.0, "int4/rtn": 0.000306, "int4/sr": 0.000309, "int4/ef": 0.001947}
+{"step": 24, "loss": 0.544, "t_train": 30.4, "t_sync": 2.9, "int4/rtn": 0.000305, "int4/sr": 0.000307, "int4/ef": 0.002373}
+{"step": 25, "loss": 0.6739, "t_train": 16.1, "t_sync": 3.6, "int4/rtn": 0.00031, "int4/sr": 0.000312, "int4/ef": 0.002912}
+{"step": 26, "loss": 0.552, "t_train": 15.2, "t_sync": 3.0, "int4/rtn": 0.0003, "int4/sr": 0.000304, "int4/ef": 0.00359}
+{"step": 27, "loss": 0.4836, "t_train": 14.8, "t_sync": 2.5, "int4/rtn": 0.000295, "int4/sr": 0.000297, "int4/ef": 0.004432}
+{"step": 28, "loss": 0.516, "t_train": 18.2, "t_sync": 2.6, "int4/rtn": 0.000288, "int4/sr": 0.00029, "int4/ef": 0.005447}
+{"step": 29, "loss": 0.487, "t_train": 14.0, "t_sync": 4.5, "int4/rtn": 0.000293, "int4/sr": 0.000295, "int4/ef": 0.00662}
+{"step": 30, "loss": 0.6642, "t_train": 20.0, "t_sync": 5.2, "int4/rtn": 0.000289, "int4/sr": 0.000291, "int4/ef": 0.007937}
+kl {"step": 30, "tokens": 9474, "t": 301.95226764678955, "int4/rtn": 0.09425037867046668, "int4/sr": 1.451467504455219, "int4/ef": 1.4060556431837579, "stuck": 0.2901573822691077}
