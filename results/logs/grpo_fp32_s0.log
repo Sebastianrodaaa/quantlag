@@ -1,0 +1,22 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  43%|████▎     | 125/290 [00:00<00:00, 1198.51it/s]Loading weights:  84%|████████▍ | 245/290 [00:00<00:00, 1195.45it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1289.83it/s]
+{"step": 1, "reward": 0.125, "trained_seqs": 8, "resp_len": 250.03125, "grad_norm": 1.390261, "t_gen": 125.51462, "t_train": 16.454455, "t_sync": 0.000168}
+{"step": 2, "reward": 0.21875, "trained_seqs": 8, "resp_len": 250.1875, "grad_norm": 1.652945, "t_gen": 113.897672, "t_train": 19.773947, "t_sync": 0.000108}
+{"step": 3, "reward": 0.15625, "trained_seqs": 8, "resp_len": 246.625, "grad_norm": 1.553468, "t_gen": 94.93696, "t_train": 23.075388, "t_sync": 0.000111}
+{"step": 4, "reward": 0.25, "trained_seqs": 12, "resp_len": 242.5, "grad_norm": 1.786958, "t_gen": 66.295049, "t_train": 23.072483, "t_sync": 0.000114}
+{"step": 5, "reward": 0.3125, "trained_seqs": 16, "resp_len": 241.96875, "grad_norm": 2.304411, "t_gen": 59.607356, "t_train": 30.331602, "t_sync": 0.000109}
+{"step": 6, "reward": 0.28125, "trained_seqs": 20, "resp_len": 232.25, "grad_norm": 2.901195, "t_gen": 69.941357, "t_train": 43.621465, "t_sync": 0.000112}
+{"step": 7, "reward": 0.34375, "trained_seqs": 4, "resp_len": 229.34375, "grad_norm": 1.27501, "t_gen": 119.247658, "t_train": 9.847242, "t_sync": 0.000108}
+{"step": 8, "reward": 0.53125, "trained_seqs": 20, "resp_len": 218.8125, "grad_norm": 2.109623, "t_gen": 108.766409, "t_train": 56.908831, "t_sync": 0.000117}
+{"step": 9, "reward": 0.03125, "trained_seqs": 4, "resp_len": 248.125, "grad_norm": 0.908323, "t_gen": 106.037814, "t_train": 9.936984, "t_sync": 0.000109}
+{"step": 10, "reward": 0.4375, "trained_seqs": 12, "resp_len": 209.3125, "grad_norm": 1.899953, "t_gen": 92.93813, "t_train": 41.019917, "t_sync": 0.000111}
+{"step": 11, "reward": 0.53125, "trained_seqs": 16, "resp_len": 200.34375, "grad_norm": 2.407321, "t_gen": 67.292006, "t_train": 25.544395, "t_sync": 0.000109}
+{"step": 12, "reward": 0.5, "trained_seqs": 16, "resp_len": 204.53125, "grad_norm": 1.860742, "t_gen": 60.446191, "t_train": 30.166956, "t_sync": 0.000124}
+{"step": 13, "reward": 0.375, "trained_seqs": 12, "resp_len": 233.5625, "grad_norm": 2.005469, "t_gen": 80.240688, "t_train": 31.639301, "t_sync": 0.000162}
+{"step": 14, "reward": 0.25, "trained_seqs": 8, "resp_len": 216.84375, "grad_norm": 1.283036, "t_gen": 87.953627, "t_train": 19.985513, "t_sync": 0.000119}
+{"step": 15, "reward": 0.28125, "trained_seqs": 16, "resp_len": 213.09375, "grad_norm": 2.79042, "t_gen": 70.282856, "t_train": 25.602299, "t_sync": 0.000107}
+{"step": 16, "reward": 0.21875, "trained_seqs": 12, "resp_len": 222.46875, "grad_norm": 2.115335, "t_gen": 61.215549, "t_train": 19.200847, "t_sync": 0.000107}
+{"step": 17, "reward": 0.28125, "trained_seqs": 12, "resp_len": 210.125, "grad_norm": 2.779312, "t_gen": 61.965804, "t_train": 20.415181, "t_sync": 0.000123}
+{"step": 18, "reward": 0.375, "trained_seqs": 16, "resp_len": 205.9375, "grad_norm": 2.059624, "t_gen": 58.282896, "t_train": 23.165164, "t_sync": 0.00011}
+{"step": 19, "reward": 0.25, "trained_seqs": 12, "resp_len": 220.25, "grad_norm": 1.662669, "t_gen": 62.222613, "t_train": 32.074701, "t_sync": 0.000108}
+{"step": 20, "reward": 0.46875, "trained_seqs": 20, "resp_len": 212.5, "grad_norm": 2.69827, "t_gen": 71.740579, "t_train": 32.205978, "t_sync": 0.000106}
+eval step 20: acc 0.440 (597s)
