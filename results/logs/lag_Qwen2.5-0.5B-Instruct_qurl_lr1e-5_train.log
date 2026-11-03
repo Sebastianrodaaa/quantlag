@@ -1,0 +1,31 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  58%|█████▊    | 169/290 [00:00<00:00, 1689.68it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1891.74it/s]
+{"step": 1, "loss": 0.8663, "t_train": 15.7, "t_sync": 0.0}
+{"step": 2, "loss": 0.5348, "t_train": 16.5, "t_sync": 0.0}
+{"step": 3, "loss": 0.6585, "t_train": 15.2, "t_sync": 0.0}
+{"step": 4, "loss": 0.5062, "t_train": 12.2, "t_sync": 0.0}
+{"step": 5, "loss": 0.6554, "t_train": 11.6, "t_sync": 0.0}
+{"step": 6, "loss": 0.4777, "t_train": 13.6, "t_sync": 0.0}
+{"step": 7, "loss": 0.5611, "t_train": 11.6, "t_sync": 0.0}
+{"step": 8, "loss": 0.4999, "t_train": 14.1, "t_sync": 0.0}
+{"step": 9, "loss": 0.6744, "t_train": 14.2, "t_sync": 0.0}
+{"step": 10, "loss": 0.6973, "t_train": 13.6, "t_sync": 0.0}
+{"step": 11, "loss": 0.7309, "t_train": 23.2, "t_sync": 0.0}
+{"step": 12, "loss": 0.4989, "t_train": 14.2, "t_sync": 0.0}
+{"step": 13, "loss": 0.5051, "t_train": 11.9, "t_sync": 0.0}
+{"step": 14, "loss": 0.5985, "t_train": 11.6, "t_sync": 0.0}
+{"step": 15, "loss": 0.578, "t_train": 14.0, "t_sync": 0.0}
+{"step": 16, "loss": 0.5124, "t_train": 14.2, "t_sync": 0.0}
+{"step": 17, "loss": 0.5515, "t_train": 11.7, "t_sync": 0.0}
+{"step": 18, "loss": 0.6565, "t_train": 12.5, "t_sync": 0.0}
+{"step": 19, "loss": 0.625, "t_train": 14.3, "t_sync": 0.0}
+{"step": 20, "loss": 0.5086, "t_train": 11.4, "t_sync": 0.0}
+{"step": 21, "loss": 0.5245, "t_train": 13.3, "t_sync": 0.0}
+{"step": 22, "loss": 0.5782, "t_train": 21.8, "t_sync": 0.0}
+{"step": 23, "loss": 0.5332, "t_train": 44.8, "t_sync": 0.0}
+{"step": 24, "loss": 0.5556, "t_train": 42.7, "t_sync": 0.0}
+{"step": 25, "loss": 0.7139, "t_train": 18.8, "t_sync": 0.0}
+{"step": 26, "loss": 0.5616, "t_train": 17.1, "t_sync": 0.0}
+{"step": 27, "loss": 0.4985, "t_train": 16.1, "t_sync": 0.0}
+{"step": 28, "loss": 0.5229, "t_train": 16.4, "t_sync": 0.0}
+{"step": 29, "loss": 0.4975, "t_train": 16.6, "t_sync": 0.0}
+{"step": 30, "loss": 0.6822, "t_train": 13.9, "t_sync": 0.0}
