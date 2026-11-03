@@ -1,0 +1,31 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  26%|██▌       | 76/290 [00:00<00:00, 755.89it/s]Loading weights:  76%|███████▌  | 221/290 [00:00<00:00, 1163.18it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1144.10it/s]
+{"step": 1, "loss": 0.8663, "t_train": 23.4, "t_sync": 0.0}
+{"step": 2, "loss": 0.5897, "t_train": 24.5, "t_sync": 0.0}
+{"step": 3, "loss": 0.6816, "t_train": 29.6, "t_sync": 0.0}
+{"step": 4, "loss": 0.5119, "t_train": 16.1, "t_sync": 0.0}
+{"step": 5, "loss": 0.6569, "t_train": 21.7, "t_sync": 0.0}
+{"step": 6, "loss": 0.4805, "t_train": 23.1, "t_sync": 0.0}
+{"step": 7, "loss": 0.552, "t_train": 18.6, "t_sync": 0.0}
+{"step": 8, "loss": 0.4666, "t_train": 26.0, "t_sync": 0.0}
+{"step": 9, "loss": 0.6285, "t_train": 26.0, "t_sync": 0.0}
+{"step": 10, "loss": 0.6457, "t_train": 35.6, "t_sync": 0.0}
+{"step": 11, "loss": 0.6856, "t_train": 35.8, "t_sync": 0.0}
+{"step": 12, "loss": 0.4517, "t_train": 24.8, "t_sync": 0.0}
+{"step": 13, "loss": 0.4661, "t_train": 23.6, "t_sync": 0.0}
+{"step": 14, "loss": 0.5648, "t_train": 19.9, "t_sync": 0.0}
+{"step": 15, "loss": 0.5077, "t_train": 26.7, "t_sync": 0.0}
+{"step": 16, "loss": 0.444, "t_train": 27.9, "t_sync": 0.0}
+{"step": 17, "loss": 0.4566, "t_train": 39.8, "t_sync": 0.0}
+{"step": 18, "loss": 0.629, "t_train": 45.0, "t_sync": 0.0}
+{"step": 19, "loss": 0.5756, "t_train": 31.5, "t_sync": 0.0}
+{"step": 20, "loss": 0.4634, "t_train": 24.2, "t_sync": 0.0}
+{"step": 21, "loss": 0.4507, "t_train": 16.4, "t_sync": 0.0}
+{"step": 22, "loss": 0.544, "t_train": 23.4, "t_sync": 0.0}
+{"step": 23, "loss": 0.4988, "t_train": 42.8, "t_sync": 0.0}
+{"step": 24, "loss": 0.4782, "t_train": 40.7, "t_sync": 0.0}
+{"step": 25, "loss": 0.6422, "t_train": 30.6, "t_sync": 0.0}
+{"step": 26, "loss": 0.5056, "t_train": 30.7, "t_sync": 0.0}
+{"step": 27, "loss": 0.4623, "t_train": 26.3, "t_sync": 0.0}
+{"step": 28, "loss": 0.4891, "t_train": 13.3, "t_sync": 0.0}
+{"step": 29, "loss": 0.4641, "t_train": 22.7, "t_sync": 0.0}
+{"step": 30, "loss": 0.614, "t_train": 24.6, "t_sync": 0.0}

@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>quantlag</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{--bg:#050505;--panel:#0d0d0d;--line:#232323;--dim:#6b6b6b;--mid:#a0a0a0;--fg:#ededed}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:12px/1.4 ui-monospace,"JetBrains Mono",Menlo,monospace}
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+aside{border-right:1px solid var(--line);padding:18px 14px;display:flex;flex-direction:column;gap:18px}
+.brand{font-size:20px;letter-spacing:.5px}
+.brand small{display:block;color:var(--dim);font-size:10px;margin-top:4px}
+.group h4{margin:0 0 6px;font-weight:400;color:var(--dim);font-size:10px;text-transform:uppercase;letter-spacing:1px}
+.opt{display:block;width:100%;text-align:left;background:none;border:1px solid transparent;color:var(--mid);padding:5px 8px;border-radius:6px;font:inherit;cursor:pointer}
+.opt:hover{border-color:var(--line)}
+.opt.on{background:#161616;border-color:#333;color:var(--fg)}
+.meta{color:var(--dim);font-size:10px;margin-top:auto;white-space:pre-wrap}
+main{padding:14px;display:grid;gap:12px;grid-template-columns:repeat(12,1fr);align-content:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0}
+.card h3{margin:0 0 2px;font-weight:400;font-size:11px;color:var(--mid);text-transform:uppercase;letter-spacing:1px;display:flex;justify-content:space-between}
+.card h3 span{color:var(--dim);text-transform:none;letter-spacing:0}
+.card p.note{margin:0 0 8px;color:var(--dim);font-size:10px}
+.tile{grid-column:span 3}
+.tile .v{font-size:30px;margin-top:6px;letter-spacing:-.5px}
+.tile .s{color:var(--dim);font-size:10px}
+.w4{grid-column:span 4}.w6{grid-column:span 6}.w8{grid-column:span 8}.w12{grid-column:span 12}
+svg{display:block;width:100%;height:auto}
+svg text{fill:var(--dim);font:9px ui-monospace,Menlo,monospace}
+.legend{display:flex;flex-wrap:wrap;gap:10px;color:var(--mid);font-size:10px;margin-top:6px}
+.legend i{display:inline-block;width:14px;height:0;border-top:2px solid #fff;vertical-align:middle;margin-right:4px}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th,td{padding:4px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{color:var(--dim);font-weight:400}
+td:first-child,th:first-child{text-align:left}
+.empty{color:var(--dim);padding:30px 0;text-align:center}
+@media(max-width:1000px){.app{grid-template-columns:1fr}.tile,.w4,.w6,.w8{grid-column:span 12}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div class="brand">quantlag<small>served-copy lag on cpu</small></div>
+  <div class="group"><h4>phase 1 model</h4><div id="models"></div></div>
+  <div class="group"><h4>learning rate</h4><div id="lrs"></div></div>
+  <div class="group"><h4>grid</h4><div id="grids"></div></div>
+  <div class="meta" id="meta"></div>
+</aside>
+<main id="main"><div class="card w12 empty">loading results/manifest.json ...</div></main>
+</div>
+<script>
+// Rule styles: black and white only, told apart by grey level and dash pattern.
+const STYLE = {rtn:["#ffffff",""], sr:["#9a9a9a","4 3"], ef:["#d0d0d0","1 2"], qurl:["#6a6a6a","8 3 2 3"], fp32:["#ffffff","2 2"], stuck:["#444","2 4"]};
+const RULES = ["rtn","sr","ef","qurl"];
+const st = {model:null, lr:null, grid:"int8"};
+let LAG = [], GRPO = [];
+
+const el = (t, a={}, kids=[]) => { const e = document.createElementNS("http://www.w3.org/2000/svg", t); for (const k in a) e.setAttribute(k, a[k]); kids.forEach(c => e.appendChild(c)); return e; };
+const fmt = v => v === 0 ? "0" : Math.abs(v) >= 100 || Math.abs(v) < 1e-2 ? v.toExponential(1) : v.toFixed(Math.abs(v) < 1 ? 3 : 2);
+const ruleOf = k => k.split("/")[1];
+
+function lineChart(series, {log=false, h=170, ylab=""} = {}) {
+  const W = 520, H = h, L = 46, R = 8, T = 8, B = 20;
+  const pts = series.flatMap(s => s.pts).filter(p => !log || p[1] > 0);
+  if (!pts.length) return document.createTextNode("no data");
+  const xs = pts.map(p => p[0]), ys = pts.map(p => log ? Math.log10(p[1]) : p[1]);
+  let [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+  if (y0 === y1) { y0 -= 1; y1 += 1; }
+  if (log) { y0 = Math.floor(y0); y1 = Math.ceil(y1); }
+  const X = x => L + (x - x0) / (x1 - x0 || 1) * (W - L - R), Y = y => T + (1 - (y - y0) / (y1 - y0)) * (H - T - B);
+  const svg = el("svg", {viewBox: `0 0 ${W} ${H}`});
+  const ticks = log ? Array.from({length: y1 - y0 + 1}, (_, i) => y0 + i) : [0, .25, .5, .75, 1].map(f => y0 + f * (y1 - y0));
+  ticks.forEach(t => { svg.appendChild(el("line", {x1: L, x2: W - R, y1: Y(t), y2: Y(t), stroke: "#1c1c1c"})); const tx = el("text", {x: L - 4, y: Y(t) + 3, "text-anchor": "end"}); tx.textContent = log ? "1e" + t : fmt(t); svg.appendChild(tx); });
+  [x0, Math.round((x0 + x1) / 2), x1].forEach(t => { const tx = el("text", {x: X(t), y: H - 6, "text-anchor": "middle"}); tx.textContent = t; svg.appendChild(tx); });
+  if (ylab) { const tx = el("text", {x: 2, y: 8}); tx.textContent = ylab; svg.appendChild(tx); }
+  series.forEach(s => {
+    const p = s.pts.filter(q => !log || q[1] > 0);
+    if (!p.length) return;
+    const d = p.map((q, i) => (i ? "L" : "M") + X(q[0]).toFixed(1) + " " + Y(log ? Math.log10(q[1]) : q[1]).toFixed(1)).join("");
+    svg.appendChild(el("path", {d, fill: "none", stroke: s.color, "stroke-width": s.w || 1.4, "stroke-dasharray": s.dash || "", opacity: s.op || 1}));
+  });
+  return svg;
+}
+
+function barChart(rows, {log=true, h=170} = {}) {  // rows: [{label, value, color}]
+  const W = 520, H = h, L = 46, B = 34, T = 8;
+  const vals = rows.map(r => r.value).filter(v => v > 0);
+  if (!vals.length) return document.createTextNode("no data");
+  const y0 = Math.floor(Math.log10(Math.min(...vals))), y1 = Math.ceil(Math.log10(Math.max(...vals)));
+  const Y = v => T + (1 - (Math.log10(v) - y0) / (y1 - y0 || 1)) * (H - T - B);
+  const svg = el("svg", {viewBox: `0 0 ${W} ${H}`});
+  for (let t = y0; t <= y1; t++) { svg.appendChild(el("line", {x1: L, x2: W, y1: Y(10 ** t), y2: Y(10 ** t), stroke: "#1c1c1c"})); const tx = el("text", {x: L - 4, y: Y(10 ** t) + 3, "text-anchor": "end"}); tx.textContent = "1e" + t; svg.appendChild(tx); }
+  const bw = (W - L) / rows.length;
+  rows.forEach((r, i) => {
+    const x = L + i * bw + bw * .2, w = bw * .6;
+    if (r.value > 0) svg.appendChild(el("rect", {x, y: Y(r.value), width: w, height: H - B - Y(r.value), fill: r.color, opacity: .9}));
+    const tx = el("text", {x: x + w / 2, y: H - 20, "text-anchor": "middle"}); tx.textContent = r.label; svg.appendChild(tx);
+    const tv = el("text", {x: x + w / 2, y: H - 8, "text-anchor": "middle", style: "fill:#ededed"}); tv.textContent = r.value > 0 ? fmt(r.value) : "-"; svg.appendChild(tv);
+  });
+  return svg;
+}
+
+function scatter(points, {h=190} = {}) {  // points: [{x, y, label, color}] log-log
+  const W = 1040, H = h, L = 46, R = 10, T = 10, B = 22;
+  const P = points.filter(p => p.x > 0 && p.y > 0);
+  if (!P.length) return document.createTextNode("no data");
+  const lx = P.map(p => Math.log10(p.x)), ly = P.map(p => Math.log10(p.y));
+  const [x0, x1, y0, y1] = [Math.floor(Math.min(...lx)), Math.ceil(Math.max(...lx)), Math.floor(Math.min(...ly)), Math.ceil(Math.max(...ly))];
+  const X = v => L + (Math.log10(v) - x0) / (x1 - x0 || 1) * (W - L - R), Y = v => T + (1 - (Math.log10(v) - y0) / (y1 - y0 || 1)) * (H - T - B);
+  const svg = el("svg", {viewBox: `0 0 ${W} ${H}`});
+  for (let t = y0; t <= y1; t++) { svg.appendChild(el("line", {x1: L, x2: W - R, y1: Y(10 ** t), y2: Y(10 ** t), stroke: "#1c1c1c"})); const tx = el("text", {x: L - 4, y: Y(10 ** t) + 3, "text-anchor": "end"}); tx.textContent = "1e" + t; svg.appendChild(tx); }
+  for (let t = x0; t <= x1; t++) { svg.appendChild(el("line", {x1: X(10 ** t), x2: X(10 ** t), y1: T, y2: H - B, stroke: "#151515"})); const tx = el("text", {x: X(10 ** t), y: H - 8, "text-anchor": "middle"}); tx.textContent = "1e" + t; svg.appendChild(tx); }
+  const placed = [];
+  P.forEach(p => {
+    svg.appendChild(el("circle", {cx: X(p.x), cy: Y(p.y), r: 9, fill: p.color, opacity: .08}));
+    svg.appendChild(el("circle", {cx: X(p.x), cy: Y(p.y), r: 3, fill: p.color}));
+    const right = X(p.x) > W - 140, w = 6.5 * p.label.length, x = X(p.x) + (right ? -6 - w : 6), y = Y(p.y) - 5;
+    if (placed.some(q => x < q[0] + q[2] + 4 && q[0] < x + w + 4 && Math.abs(q[1] - y) < 12)) return;  // label only where its box is free
+    placed.push([x, y, w]);
+    const tx = el("text", {x, y}); tx.textContent = p.label; svg.appendChild(tx);
+  });
+  return svg;
+}
+
+function legend(keys) {
+  const d = document.createElement("div"); d.className = "legend";
+  keys.forEach(k => { const [c, dash] = STYLE[k] || ["#fff", ""]; d.innerHTML += `<span><i style="border-top:2px ${dash ? "dashed" : "solid"} ${c}"></i>${k}</span>`; });
+  return d;
+}
+
+function card(cls, title, sub, note, body) {
+  const c = document.createElement("div"); c.className = "card " + cls;
+  c.innerHTML = `<h3>${title}<span>${sub || ""}</span></h3>` + (note ? `<p class="note">${note}</p>` : "");
+  (Array.isArray(body) ? body : [body]).forEach(b => b && c.appendChild(b));
+  return c;
+}
+function tile(title, v, s) { const c = document.createElement("div"); c.className = "card tile"; c.innerHTML = `<h3>${title}</h3><div class="v">${v}</div><div class="s">${s}</div>`; return c; }
+
+function buttons(id, values, key, label = v => v) {
+  const box = document.getElementById(id); box.innerHTML = "";
+  values.forEach(v => { const b = document.createElement("button"); b.className = "opt" + (st[key] === v ? " on" : ""); b.textContent = label(v); b.onclick = () => { st[key] = v; render(); }; box.appendChild(b); });
+}
+
+function runsFor(model, lr) { return LAG.filter(r => r.config.model === model && r.config.lr === lr); }
+function series(run, grid, field) {
+  const out = {};
+  for (const s of run.steps) for (const k in s.exports) if (k.startsWith(grid + "/")) (out[k] ||= []).push([s.step, s.exports[k][field]]);
+  return out;
+}
+function klAt(runs, step) {  // merged {key: kl} at a step over plain + qurl runs
+  const o = {};
+  runs.forEach(r => (r.kl.find(k => k.step === step) ? Object.assign(o, r.kl.find(k => k.step === step)) : 0));
+  return o;
+}
+
+function render() {
+  const models = [...new Set(LAG.map(r => r.config.model))];
+  st.model ||= models[models.length - 1];
+  const lrs = [...new Set(LAG.filter(r => r.config.model === st.model).map(r => r.config.lr))].sort((a, b) => a - b);
+  if (!lrs.includes(st.lr)) st.lr = lrs[0];
+  buttons("models", models, "model", m => m.split("/")[1]);
+  buttons("lrs", lrs, "lr", v => v.toExponential(0));
+  buttons("grids", ["bf16", "int8", "int4"], "grid");
+  const runs = runsFor(st.model, st.lr), g = st.grid;
+  const main = document.getElementById("main"); main.innerHTML = "";
+  if (!runs.length) { main.innerHTML = '<div class="card w12 empty">no phase 1 runs for this selection yet</div>'; return; }
+  const merged = (field) => Object.assign({}, ...runs.map(r => series(r, g, field)));
+  const ch = merged("changed_frac"), re = merged("realized"), te = merged("track_err");
+  const last = k => (ch[k] || []).slice(1).map(p => p[1]);
+  const mean = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : NaN;
+  const steps = runs[0].steps.length;
+  const kl50 = klAt(runs, Math.max(...runs.flatMap(r => r.kl.map(k => k.step))));
+  const kl0 = klAt(LAG.filter(r => r.config.model === st.model), 0);
+  // tiles
+  main.appendChild(tile(`rtn ${g} changed / step`, (100 * mean(last(g + "/rtn"))).toFixed(3) + "%", `mean over steps 2-${steps}, ${st.lr.toExponential(0)}`));
+  main.appendChild(tile(`ef ${g} changed / step`, (100 * mean(last(g + "/ef"))).toFixed(3) + "%", "error feedback re-rounds every sync"));
+  const kr = kl50[g + "/rtn"] && kl50[g + "/ef"] ? kl50[g + "/rtn"] / kl50[g + "/ef"] : NaN;
+  main.appendChild(tile(`kl ratio rtn / ef`, isNaN(kr) ? "-" : kr.toFixed(2) + "x", `served vs master on ${runs[0].config.kl_n} held-out prompts`));
+  main.appendChild(tile("grpo runs", GRPO.length, GRPO.length ? `${GRPO.filter(r => r.steps.length).length} training + ${GRPO.filter(r => !r.steps.length).length} step-0 eval` : "phase 2 pending"));
+  // panels
+  const keys = Object.keys(ch).sort((a, b) => RULES.indexOf(ruleOf(a)) - RULES.indexOf(ruleOf(b)));
+  const sty = k => ({color: STYLE[ruleOf(k)][0], dash: STYLE[ruleOf(k)][1]});
+  main.appendChild(card("w8", "served weights changed per step", `${st.model.split("/")[1]} / ${g} / lr ${st.lr.toExponential(0)}`, "fraction of block linear weights whose served code changed at each sync (log scale)",
+    [lineChart(keys.map(k => ({...sty(k), pts: ch[k].slice(1)})), {log: true}), legend(keys.map(ruleOf))]));
+  const klRows = keys.map(k => ({label: ruleOf(k), value: kl50[k] || 0, color: STYLE[ruleOf(k)][0]}));
+  klRows.push({label: "stuck", value: kl50.stuck || 0, color: "#444"});
+  if (kl0[g + "/rtn"] !== undefined) klRows.push({label: "q floor", value: kl0[g + "/rtn"], color: "#2a2a2a"});
+  main.appendChild(card("w4", "served vs master kl", `step ${kl50.step ?? "-"}`, "per response token; stuck = block weights frozen at step 0; q floor = step-0 rtn", barChart(klRows)));
+  main.appendChild(card("w6", "realized update", "<Δserved, Δmaster> / |Δmaster|²", "1 = the served copy moved by the master update on average; 0 = it did not move",
+    [lineChart(keys.map(k => ({...sty(k), pts: re[k]})), {}), legend(keys.map(ruleOf))]));
+  main.appendChild(card("w6", "tracking error", "|Δserved - Δmaster| / |Δmaster|", "rounding noise relative to the cumulative update (log scale)",
+    [lineChart(keys.map(k => ({...sty(k), pts: te[k]})), {log: true}), legend(keys.map(ruleOf))]));
+  // cluster scatter over every phase 1 run: changed fraction vs KL at the last step
+  const pts = [];
+  LAG.forEach(r => { const k = r.kl[r.kl.length - 1]; if (!k || !k.step) return; const s = r.steps[r.steps.length - 1];
+    for (const key in s.exports) if (k[key] !== undefined) pts.push({x: mean(r.steps.slice(1).map(q => q.exports[key].changed_frac)), y: k[key], color: STYLE[ruleOf(key)][0], label: `${key.replace("/", " ")} ${r.config.lr.toExponential(0)}${r.config.model.includes("Smol") ? " s" : ""}`}); });
+  main.appendChild(card("w12", "every phase 1 export", "x: mean changed fraction per step, y: served vs master kl at the last step", "each dot is one (model, lr, grid, rule); s = SmolLM2-135M", scatter(pts.filter(p => p.label.includes(g)), {h: 230})));
+  // phase 2
+  const arms = ["fp32", "rtn", "ef", "qurl"];
+  const rs = arms.flatMap(a => GRPO.filter(r => r.config.arm === a).map(r => ({...STYLE[a] && {color: STYLE[a][0], dash: STYLE[a][1]}, op: .9, pts: smooth(r.steps.map(s => [s.step, s.reward]))})));
+  main.appendChild(card("w6", "grpo reward", "gsm8k train, int8 served rollouts", "exact-match reward per step (3-step moving mean), one line per seed",
+    [GRPO.length ? lineChart(rs, {}) : document.createTextNode("phase 2 pending"), legend(arms)]));
+  const accRows = [];
+  arms.forEach(a => { const runsA = GRPO.filter(r => r.config.arm === a); const steps = [...new Set(runsA.flatMap(r => r.evals.map(e => e.step)))].sort((x, y) => x - y);
+    steps.forEach(s => { const v = runsA.map(r => r.evals.find(e => e.step === s)).filter(Boolean); accRows.push([a, s, v.length, mean(v.map(e => e.acc)), v.length > 1 ? Math.sqrt(mean(v.map(e => (e.acc - mean(v.map(q => q.acc))) ** 2))) : NaN, v[0].n]); }); });
+  const tbl = document.createElement("table");
+  tbl.innerHTML = "<tr><th>arm</th><th>step</th><th>runs</th><th>acc</th><th>± sd</th><th>n</th></tr>" + accRows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${(100 * r[3]).toFixed(1)}%</td><td>${isNaN(r[4]) ? "-" : (100 * r[4]).toFixed(1)}</td><td>${r[5]}</td></tr>`).join("");
+  main.appendChild(card("w6", "held-out gsm8k accuracy", "greedy, 256 new tokens", "test split, first n problems; step 0 is shared where the served weights are identical", accRows.length ? tbl : document.createTextNode("phase 2 pending")));
+  const wall = document.createElement("table");
+  wall.innerHTML = "<tr><th>run</th><th>steps</th><th>s / step</th><th>wall</th></tr>" + [...LAG, ...GRPO].map(r => { const n = r.steps.length, w = r.wall_s; const name = r.config.arm ? `grpo ${r.config.arm} s${r.config.seed}` : `lag ${r.config.model.split("/")[1].split("-")[0]} ${r.config.variant} ${r.config.lr.toExponential(0)}`;
+    const per = mean(r.steps.map(s => (s.t_gen || 0) + (s.t_train || 0) + (s.t_sync || 0))); return `<tr><td>${name}</td><td>${n}</td><td>${n ? per.toFixed(1) : "-"}</td><td>${w ? (w / 3600).toFixed(2) + " h" : "running"}</td></tr>`; }).join("");
+  main.appendChild(card("w12", "runs", "", "every run on this machine, read from results/*.json", wall));
+  const any = LAG[0] || GRPO[0];
+  document.getElementById("meta").textContent = any ? `cpu\n${any.cpu}\ntorch ${any.torch}, ${any.threads} threads\n\n${LAG.length} phase 1 runs\n${GRPO.length} phase 2 runs` : "";
+}
+function mergeLag(runs) {  // Qwen phase 1 replays one trajectory per grid into separate files; join them per (model, variant, lr)
+  const by = {};
+  for (const r of runs) {
+    const id = [r.config.model, r.config.variant, r.config.lr].join("|"), m = by[id];
+    if (!m) { by[id] = r; continue; }
+    r.steps.forEach((s, i) => Object.assign(m.steps[i].exports, s.exports));
+    r.kl.forEach(k => { const o = m.kl.find(q => q.step === k.step); o ? Object.assign(o, k) : m.kl.push(k); });
+    m.wall_s = m.wall_s && r.wall_s ? m.wall_s + r.wall_s : undefined;
+  }
+  return Object.values(by);
+}
+function smooth(p, k = 3) { return p.map((q, i) => [q[0], p.slice(Math.max(0, i - k + 1), i + 1).reduce((a, b) => a + b[1], 0) / Math.min(k, i + 1)]); }
+
+fetch("../results/manifest.json").then(r => r.json()).then(async files => {
+  const all = (await Promise.all(files.map(f => fetch("../results/" + f).then(r => r.ok ? r.json() : null).then(d => d && (d.file = f, d)).catch(() => null)))).filter(Boolean);
+  LAG = mergeLag(all.filter(d => d.file.startsWith("lag_"))); GRPO = all.filter(d => d.file.startsWith("grpo_"));
+  render();
+}).catch(e => { document.getElementById("main").innerHTML = `<div class="card w12 empty">could not read results/manifest.json (${e}). serve the repo root: python3 -m http.server 8000, then open /app/</div>`; });
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  60%|█████▉    | 173/290 [00:00<00:00, 1713.44it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1907.57it/s]
+{"step": 1, "loss": 0.8663, "t_train": 15.7, "t_sync": 4.9, "bf16/qurl": 0.254697, "int8/qurl": 0.023482, "int4/qurl": 0.002867}
+{"step": 2, "loss": 0.5348, "t_train": 16.5, "t_sync": 3.5, "bf16/qurl": 0.259646, "int8/qurl": 0.014537, "int4/qurl": 0.001289}
+{"step": 3, "loss": 0.6585, "t_train": 15.2, "t_sync": 1.9, "bf16/qurl": 0.181941, "int8/qurl": 0.011315, "int4/qurl": 0.001023}
+{"step": 4, "loss": 0.5062, "t_train": 12.2, "t_sync": 1.8, "bf16/qurl": 0.178423, "int8/qurl": 0.009472, "int4/qurl": 0.000843}
+{"step": 5, "loss": 0.6554, "t_train": 11.6, "t_sync": 1.2, "bf16/qurl": 0.151465, "int8/qurl": 0.008279, "int4/qurl": 0.00074}
+{"step": 6, "loss": 0.4777, "t_train": 13.6, "t_sync": 2.4, "bf16/qurl": 0.138217, "int8/qurl": 0.007431, "int4/qurl": 0.000662}
+{"step": 7, "loss": 0.5611, "t_train": 11.6, "t_sync": 1.5, "bf16/qurl": 0.13064, "int8/qurl": 0.006861, "int4/qurl": 0.00061}
+{"step": 8, "loss": 0.4999, "t_train": 14.1, "t_sync": 1.2, "bf16/qurl": 0.123504, "int8/qurl": 0.006333, "int4/qurl": 0.000563}
+{"step": 9, "loss": 0.6744, "t_train": 14.2, "t_sync": 1.3, "bf16/qurl": 0.119206, "int8/qurl": 0.006036, "int4/qurl": 0.000538}
+{"step": 10, "loss": 0.6973, "t_train": 13.6, "t_sync": 1.6, "bf16/qurl": 0.116421, "int8/qurl": 0.005856, "int4/qurl": 0.000528}
+{"step": 11, "loss": 0.7309, "t_train": 23.2, "t_sync": 1.4, "bf16/qurl": 0.117166, "int8/qurl": 0.005913, "int4/qurl": 0.000533}
+{"step": 12, "loss": 0.4989, "t_train": 14.2, "t_sync": 1.3, "bf16/qurl": 0.112497, "int8/qurl": 0.005614, "int4/qurl": 0.000511}
+{"step": 13, "loss": 0.5051, "t_train": 11.9, "t_sync": 1.4, "bf16/qurl": 0.1088, "int8/qurl": 0.005364, "int4/qurl": 0.000493}
+{"step": 14, "loss": 0.5985, "t_train": 11.6, "t_sync": 1.3, "bf16/qurl": 0.104538, "int8/qurl": 0.005094, "int4/qurl": 0.000465}
+{"step": 15, "loss": 0.578, "t_train": 14.0, "t_sync": 1.7, "bf16/qurl": 0.103327, "int8/qurl": 0.005022, "int4/qurl": 0.000459}
+{"step": 16, "loss": 0.5124, "t_train": 14.2, "t_sync": 1.4, "bf16/qurl": 0.099506, "int8/qurl": 0.004785, "int4/qurl": 0.000438}
+{"step": 17, "loss": 0.5515, "t_train": 11.7, "t_sync": 1.3, "bf16/qurl": 0.098174, "int8/qurl": 0.004702, "int4/qurl": 0.000432}
+{"step": 18, "loss": 0.6565, "t_train": 12.5, "t_sync": 1.3, "bf16/qurl": 0.09592, "int8/qurl": 0.004554, "int4/qurl": 0.000417}
+{"step": 19, "loss": 0.625, "t_train": 14.3, "t_sync": 1.3, "bf16/qurl": 0.09295, "int8/qurl": 0.004383, "int4/qurl": 0.000403}
+{"step": 20, "loss": 0.5086, "t_train": 11.4, "t_sync": 1.6, "bf16/qurl": 0.091449, "int8/qurl": 0.00429, "int4/qurl": 0.000393}
+{"step": 21, "loss": 0.5245, "t_train": 13.3, "t_sync": 1.4, "bf16/qurl": 0.091155, "int8/qurl": 0.004278, "int4/qurl": 0.000392}
+{"step": 22, "loss": 0.5782, "t_train": 21.8, "t_sync": 2.2, "bf16/qurl": 0.089469, "int8/qurl": 0.004173, "int4/qurl": 0.000381}
+{"step": 23, "loss": 0.5332, "t_train": 44.8, "t_sync": 1.3, "bf16/qurl": 0.090198, "int8/qurl": 0.00422, "int4/qurl": 0.000389}
+{"step": 24, "loss": 0.5556, "t_train": 42.7, "t_sync": 1.4, "bf16/qurl": 0.089607, "int8/qurl": 0.004184, "int4/qurl": 0.000384}
+{"step": 25, "loss": 0.7139, "t_train": 18.8, "t_sync": 1.3, "bf16/qurl": 0.090979, "int8/qurl": 0.004263, "int4/qurl": 0.000392}
+{"step": 26, "loss": 0.5616, "t_train": 17.1, "t_sync": 1.3, "bf16/qurl": 0.088876, "int8/qurl": 0.004136, "int4/qurl": 0.00038}
+{"step": 27, "loss": 0.4985, "t_train": 16.1, "t_sync": 1.5, "bf16/qurl": 0.08784, "int8/qurl": 0.004087, "int4/qurl": 0.000375}
+{"step": 28, "loss": 0.5229, "t_train": 16.4, "t_sync": 1.3, "bf16/qurl": 0.086083, "int8/qurl": 0.003982, "int4/qurl": 0.000365}
+{"step": 29, "loss": 0.4975, "t_train": 16.6, "t_sync": 1.7, "bf16/qurl": 0.085538, "int8/qurl": 0.003945, "int4/qurl": 0.000361}
+{"step": 30, "loss": 0.6822, "t_train": 13.9, "t_sync": 1.5, "bf16/qurl": 0.085194, "int8/qurl": 0.003919, "int4/qurl": 0.000359}
+kl {"step": 30, "tokens": 9474, "t": 192.35352563858032, "bf16/qurl": 8.537299487304539e-05, "int8/qurl": 0.0008859041802569583, "int4/qurl": 0.08093234220487874, "stuck": 0.311960625614294}

@@ -1,0 +1,32 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  63%|██████▎   | 183/290 [00:00<00:00, 1807.27it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1979.34it/s]
+{"step": 1, "loss": 0.8663, "t_train": 15.1, "t_sync": 5.6, "int8/rtn": 0.017747, "int8/sr": 0.017212, "int8/ef": 0.0}
+{"step": 2, "loss": 0.5331, "t_train": 13.9, "t_sync": 2.9, "int8/rtn": 0.010823, "int8/sr": 0.01093, "int8/ef": 2e-06}
+{"step": 3, "loss": 0.6511, "t_train": 14.3, "t_sync": 2.4, "int8/rtn": 0.00847, "int8/sr": 0.00846, "int8/ef": 7.7e-05}
+{"step": 4, "loss": 0.4957, "t_train": 12.4, "t_sync": 2.6, "int8/rtn": 0.007094, "int8/sr": 0.007078, "int8/ef": 0.000951}
+{"step": 5, "loss": 0.6424, "t_train": 10.8, "t_sync": 3.7, "int8/rtn": 0.006197, "int8/sr": 0.006208, "int8/ef": 0.002748}
+{"step": 6, "loss": 0.4747, "t_train": 12.4, "t_sync": 2.9, "int8/rtn": 0.005562, "int8/sr": 0.005558, "int8/ef": 0.005873}
+{"step": 7, "loss": 0.5562, "t_train": 11.1, "t_sync": 2.7, "int8/rtn": 0.005143, "int8/sr": 0.005148, "int8/ef": 0.028614}
+{"step": 8, "loss": 0.4847, "t_train": 13.9, "t_sync": 3.6, "int8/rtn": 0.004732, "int8/sr": 0.004735, "int8/ef": 0.105257}
+{"step": 9, "loss": 0.6642, "t_train": 13.6, "t_sync": 4.4, "int8/rtn": 0.004501, "int8/sr": 0.004501, "int8/ef": 0.193364}
+{"step": 10, "loss": 0.681, "t_train": 12.5, "t_sync": 4.8, "int8/rtn": 0.004356, "int8/sr": 0.004357, "int8/ef": 0.218374}
+{"step": 11, "loss": 0.7162, "t_train": 18.2, "t_sync": 5.4, "int8/rtn": 0.004373, "int8/sr": 0.004372, "int8/ef": 0.192489}
+{"step": 12, "loss": 0.479, "t_train": 13.7, "t_sync": 4.4, "int8/rtn": 0.004147, "int8/sr": 0.004149, "int8/ef": 0.157843}
+{"step": 13, "loss": 0.484, "t_train": 12.3, "t_sync": 3.3, "int8/rtn": 0.003954, "int8/sr": 0.003951, "int8/ef": 0.133305}
+{"step": 14, "loss": 0.578, "t_train": 10.9, "t_sync": 2.5, "int8/rtn": 0.003774, "int8/sr": 0.003774, "int8/ef": 0.122723}
+{"step": 15, "loss": 0.5384, "t_train": 14.0, "t_sync": 2.9, "int8/rtn": 0.003736, "int8/sr": 0.003737, "int8/ef": 0.123002}
+{"step": 16, "loss": 0.4883, "t_train": 13.9, "t_sync": 3.5, "int8/rtn": 0.003554, "int8/sr": 0.003556, "int8/ef": 0.128295}
+{"step": 17, "loss": 0.5158, "t_train": 12.1, "t_sync": 6.5, "int8/rtn": 0.003483, "int8/sr": 0.003487, "int8/ef": 0.134193}
+{"step": 18, "loss": 0.6487, "t_train": 11.6, "t_sync": 4.5, "int8/rtn": 0.003409, "int8/sr": 0.003407, "int8/ef": 0.139006}
+{"step": 19, "loss": 0.6099, "t_train": 32.4, "t_sync": 4.1, "int8/rtn": 0.003271, "int8/sr": 0.003277, "int8/ef": 0.142685}
+{"step": 20, "loss": 0.4915, "t_train": 17.7, "t_sync": 3.3, "int8/rtn": 0.003264, "int8/sr": 0.003264, "int8/ef": 0.145716}
+{"step": 21, "loss": 0.5138, "t_train": 22.5, "t_sync": 2.8, "int8/rtn": 0.003271, "int8/sr": 0.003268, "int8/ef": 0.148407}
+{"step": 22, "loss": 0.5582, "t_train": 15.7, "t_sync": 2.9, "int8/rtn": 0.003205, "int8/sr": 0.003207, "int8/ef": 0.150935}
+{"step": 23, "loss": 0.5258, "t_train": 17.6, "t_sync": 3.1, "int8/rtn": 0.003267, "int8/sr": 0.003269, "int8/ef": 0.153356}
+{"step": 24, "loss": 0.544, "t_train": 30.4, "t_sync": 3.6, "int8/rtn": 0.003248, "int8/sr": 0.003251, "int8/ef": 0.155621}
+{"step": 25, "loss": 0.6739, "t_train": 16.1, "t_sync": 3.5, "int8/rtn": 0.003295, "int8/sr": 0.003293, "int8/ef": 0.157787}
+{"step": 26, "loss": 0.552, "t_train": 15.2, "t_sync": 4.5, "int8/rtn": 0.003211, "int8/sr": 0.003207, "int8/ef": 0.159936}
+{"step": 27, "loss": 0.4836, "t_train": 14.8, "t_sync": 4.3, "int8/rtn": 0.003142, "int8/sr": 0.003146, "int8/ef": 0.161998}
+{"step": 28, "loss": 0.516, "t_train": 18.2, "t_sync": 2.6, "int8/rtn": 0.003067, "int8/sr": 0.003068, "int8/ef": 0.164006}
+{"step": 29, "loss": 0.487, "t_train": 14.0, "t_sync": 2.9, "int8/rtn": 0.003113, "int8/sr": 0.00311, "int8/ef": 0.166004}
+{"step": 30, "loss": 0.6642, "t_train": 20.0, "t_sync": 10.4, "int8/rtn": 0.003068, "int8/sr": 0.003077, "int8/ef": 0.167915}
+kl {"step": 30, "tokens": 9474, "t": 250.74892401695251, "int8/rtn": 0.00103415401332356, "int8/sr": 0.002136261680692809, "int8/ef": 0.0017003873524429171, "stuck": 0.2901573822691077}

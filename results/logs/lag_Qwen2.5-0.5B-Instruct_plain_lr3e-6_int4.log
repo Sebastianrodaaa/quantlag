@@ -1,0 +1,32 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  47%|████▋     | 135/290 [00:00<00:00, 1348.37it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1516.56it/s]
+{"step": 1, "loss": 0.8663, "t_train": 15.8, "t_sync": 5.3, "int4/rtn": 0.001859, "int4/sr": 0.000488, "int4/ef": 0.0}
+{"step": 2, "loss": 0.5567, "t_train": 15.6, "t_sync": 3.5, "int4/rtn": 0.000128, "int4/sr": 0.000319, "int4/ef": 0.0}
+{"step": 3, "loss": 0.6485, "t_train": 15.7, "t_sync": 3.4, "int4/rtn": 0.000273, "int4/sr": 0.000255, "int4/ef": 0.0}
+{"step": 4, "loss": 0.4806, "t_train": 18.4, "t_sync": 3.0, "int4/rtn": 0.000334, "int4/sr": 0.000214, "int4/ef": 0.0}
+{"step": 5, "loss": 0.6369, "t_train": 12.2, "t_sync": 2.9, "int4/rtn": 0.000201, "int4/sr": 0.00019, "int4/ef": 0.0}
+{"step": 6, "loss": 0.4739, "t_train": 16.3, "t_sync": 3.3, "int4/rtn": 0.000168, "int4/sr": 0.000169, "int4/ef": 0.0}
+{"step": 7, "loss": 0.5497, "t_train": 17.8, "t_sync": 2.9, "int4/rtn": 0.000183, "int4/sr": 0.000158, "int4/ef": 0.0}
+{"step": 8, "loss": 0.4591, "t_train": 16.7, "t_sync": 2.6, "int4/rtn": 0.000179, "int4/sr": 0.000145, "int4/ef": 0.0}
+{"step": 9, "loss": 0.6336, "t_train": 16.5, "t_sync": 2.6, "int4/rtn": 0.000165, "int4/sr": 0.000135, "int4/ef": 0.0}
+{"step": 10, "loss": 0.639, "t_train": 13.0, "t_sync": 2.6, "int4/rtn": 0.000154, "int4/sr": 0.000127, "int4/ef": 0.0}
+{"step": 11, "loss": 0.6906, "t_train": 14.4, "t_sync": 4.3, "int4/rtn": 0.000147, "int4/sr": 0.000125, "int4/ef": 0.0}
+{"step": 12, "loss": 0.4464, "t_train": 14.1, "t_sync": 6.6, "int4/rtn": 0.000139, "int4/sr": 0.000118, "int4/ef": 0.0}
+{"step": 13, "loss": 0.4544, "t_train": 12.6, "t_sync": 4.3, "int4/rtn": 0.000133, "int4/sr": 0.000114, "int4/ef": 0.0}
+{"step": 14, "loss": 0.5528, "t_train": 11.8, "t_sync": 3.1, "int4/rtn": 0.000127, "int4/sr": 0.00011, "int4/ef": 0.0}
+{"step": 15, "loss": 0.4901, "t_train": 19.2, "t_sync": 4.0, "int4/rtn": 0.000127, "int4/sr": 0.000111, "int4/ef": 0.0}
+{"step": 16, "loss": 0.4409, "t_train": 23.1, "t_sync": 7.2, "int4/rtn": 0.000124, "int4/sr": 0.000106, "int4/ef": 0.0}
+{"step": 17, "loss": 0.4604, "t_train": 13.5, "t_sync": 7.6, "int4/rtn": 0.000118, "int4/sr": 0.000103, "int4/ef": 0.0}
+{"step": 18, "loss": 0.6212, "t_train": 12.0, "t_sync": 7.8, "int4/rtn": 0.000116, "int4/sr": 0.000101, "int4/ef": 1e-06}
+{"step": 19, "loss": 0.5737, "t_train": 15.0, "t_sync": 7.8, "int4/rtn": 0.000112, "int4/sr": 9.7e-05, "int4/ef": 2e-06}
+{"step": 20, "loss": 0.4682, "t_train": 12.3, "t_sync": 6.9, "int4/rtn": 0.00011, "int4/sr": 9.7e-05, "int4/ef": 4e-06}
+{"step": 21, "loss": 0.4628, "t_train": 12.6, "t_sync": 10.5, "int4/rtn": 0.00011, "int4/sr": 9.5e-05, "int4/ef": 6e-06}
+{"step": 22, "loss": 0.5374, "t_train": 13.7, "t_sync": 8.1, "int4/rtn": 0.000107, "int4/sr": 9.3e-05, "int4/ef": 1.1e-05}
+{"step": 23, "loss": 0.5015, "t_train": 14.4, "t_sync": 9.0, "int4/rtn": 0.000109, "int4/sr": 9.4e-05, "int4/ef": 1.6e-05}
+{"step": 24, "loss": 0.4843, "t_train": 15.0, "t_sync": 7.7, "int4/rtn": 0.000106, "int4/sr": 9.3e-05, "int4/ef": 2.3e-05}
+{"step": 25, "loss": 0.6503, "t_train": 12.9, "t_sync": 6.0, "int4/rtn": 0.000111, "int4/sr": 9.6e-05, "int4/ef": 3.1e-05}
+{"step": 26, "loss": 0.5086, "t_train": 14.1, "t_sync": 4.4, "int4/rtn": 0.000106, "int4/sr": 9.4e-05, "int4/ef": 4e-05}
+{"step": 27, "loss": 0.461, "t_train": 16.5, "t_sync": 3.3, "int4/rtn": 0.000105, "int4/sr": 9.2e-05, "int4/ef": 5.2e-05}
+{"step": 28, "loss": 0.4871, "t_train": 11.2, "t_sync": 3.0, "int4/rtn": 0.000103, "int4/sr": 9.1e-05, "int4/ef": 6.5e-05}
+{"step": 29, "loss": 0.4511, "t_train": 13.3, "t_sync": 3.2, "int4/rtn": 0.000103, "int4/sr": 9.1e-05, "int4/ef": 8e-05}
+{"step": 30, "loss": 0.6158, "t_train": 13.9, "t_sync": 3.8, "int4/rtn": 0.000103, "int4/sr": 9.2e-05, "int4/ef": 9.6e-05}
+kl {"step": 30, "tokens": 9474, "t": 200.9745864868164, "int4/rtn": 0.1091360402541676, "int4/sr": 0.11570468150436429, "int4/ef": 0.39980964876343306, "stuck": 0.26303232308112273}

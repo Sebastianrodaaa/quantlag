@@ -1,0 +1,56 @@
+mkdir -p results/logs
+for v in plain qurl; do for lr in 1e-6 3e-6 1e-5; do kl=30; [ $lr = 1e-6 ] && kl=0,30; \
+  d=results/traj_${v}_lr$lr; [ $v = plain ] && gs="bf16 int8 int4" || gs="bf16,int8,int4"; \
+  for g in $gs; do o=results/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_$(echo $g | tr , -).json; \
+    grep -qs wall_s $o && continue; \
+    grep -qs wall_s $d/train.json || /usr/bin/python3 -m quantlag.lag --model Qwen/Qwen2.5-0.5B-Instruct --micro 1 --steps 30 --kl-n 100 --variant $v --lr $lr --grids "" --kl-at "" --dump $d 2>&1 \
+      | grep --line-buffered -v -i warn > results/logs/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_train.log; \
+    grep -qs wall_s $d/train.json || exit 1; \
+    /usr/bin/python3 -m quantlag.lag --model Qwen/Qwen2.5-0.5B-Instruct --micro 1 --steps 30 --kl-n 100 --variant $v --lr $lr --grids $g --kl-at $kl --replay $d --out $o 2>&1 \
+      | grep --line-buffered -v -i warn > results/logs/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_$(echo $g | tr , -).log; \
+  done; [ $(grep -ls wall_s results/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_*.json | wc -l) = $(echo $gs | wc -w) ] && rm -rf $d; done; done
+make: *** [Makefile:54: lag-split] Terminated
+mkdir -p results/logs
+for v in plain qurl; do for lr in 1e-6; do kl=30; [ $lr = 1e-6 ] && kl=0,30; \
+  d=results/traj_${v}_lr$lr; [ $v = plain ] && gs="bf16 int8 int4" || gs="bf16,int8,int4"; \
+  for g in $gs; do o=results/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_$(echo $g | tr , -).json; \
+    grep -qs wall_s $o && continue; \
+    grep -qs wall_s $d/train.json || /usr/bin/python3 -m quantlag.lag --model Qwen/Qwen2.5-0.5B-Instruct --micro 1 --steps 30 --kl-n 100 --variant $v --lr $lr --grids "" --kl-at "" --dump $d 2>&1 \
+      | grep --line-buffered -v -i warn > results/logs/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_train.log; \
+    grep -qs wall_s $d/train.json || exit 1; \
+    /usr/bin/python3 -m quantlag.lag --model Qwen/Qwen2.5-0.5B-Instruct --micro 1 --steps 30 --kl-n 100 --variant $v --lr $lr --grids $g --kl-at $kl --replay $d --out $o 2>&1 \
+      | grep --line-buffered -v -i warn > results/logs/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_$(echo $g | tr , -).log; \
+  done; [ $(grep -ls wall_s results/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_*.json | wc -l) = $(echo $gs | wc -w) ] && rm -rf $d; done; done
+mkdir -p results/logs
+for v in plain; do for lr in 1e-5; do kl=30; [ $lr = 1e-6 ] && kl=0,30; \
+  d=results/traj_${v}_lr$lr; [ $v = plain ] && gs="bf16 int8 int4" || gs="bf16,int8,int4"; \
+  for g in $gs; do o=results/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_$(echo $g | tr , -).json; \
+    grep -qs wall_s $o && continue; \
+    grep -qs wall_s $d/train.json || /usr/bin/python3 -m quantlag.lag --model Qwen/Qwen2.5-0.5B-Instruct --micro 1 --steps 30 --kl-n 100 --variant $v --lr $lr --grids "" --kl-at "" --dump $d 2>&1 \
+      | grep --line-buffered -v -i warn > results/logs/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_train.log; \
+    grep -qs wall_s $d/train.json || exit 1; \
+    /usr/bin/python3 -m quantlag.lag --model Qwen/Qwen2.5-0.5B-Instruct --micro 1 --steps 30 --kl-n 100 --variant $v --lr $lr --grids $g --kl-at $kl --replay $d --out $o 2>&1 \
+      | grep --line-buffered -v -i warn > results/logs/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_$(echo $g | tr , -).log; \
+  done; [ $(grep -ls wall_s results/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_*.json | wc -l) = $(echo $gs | wc -w) ] && rm -rf $d; done; done
+mkdir -p results/logs
+for v in plain; do for lr in 3e-6; do kl=30; [ $lr = 1e-6 ] && kl=0,30; \
+  d=results/traj_${v}_lr$lr; [ $v = plain ] && gs="bf16 int8 int4" || gs="bf16,int8,int4"; \
+  for g in $gs; do o=results/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_$(echo $g | tr , -).json; \
+    grep -qs wall_s $o && continue; \
+    grep -qs wall_s $d/train.json || /usr/bin/python3 -m quantlag.lag --model Qwen/Qwen2.5-0.5B-Instruct --micro 1 --steps 30 --kl-n 100 --variant $v --lr $lr --grids "" --kl-at "" --dump $d 2>&1 \
+      | grep --line-buffered -v -i warn > results/logs/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_train.log; \
+    grep -qs wall_s $d/train.json || exit 1; \
+    /usr/bin/python3 -m quantlag.lag --model Qwen/Qwen2.5-0.5B-Instruct --micro 1 --steps 30 --kl-n 100 --variant $v --lr $lr --grids $g --kl-at $kl --replay $d --out $o 2>&1 \
+      | grep --line-buffered -v -i warn > results/logs/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_$(echo $g | tr , -).log; \
+  done; [ $(grep -ls wall_s results/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_*.json | wc -l) = $(echo $gs | wc -w) ] && rm -rf $d; done; done
+mkdir -p results/logs
+for v in qurl; do for lr in 3e-6 1e-5; do kl=30; [ $lr = 1e-6 ] && kl=0,30; \
+  d=results/traj_${v}_lr$lr; [ $v = plain ] && gs="bf16 int8 int4" || gs="bf16,int8,int4"; \
+  for g in $gs; do o=results/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_$(echo $g | tr , -).json; \
+    grep -qs wall_s $o && continue; \
+    grep -qs wall_s $d/train.json || /usr/bin/python3 -m quantlag.lag --model Qwen/Qwen2.5-0.5B-Instruct --micro 1 --steps 30 --kl-n 100 --variant $v --lr $lr --grids "" --kl-at "" --dump $d 2>&1 \
+      | grep --line-buffered -v -i warn > results/logs/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_train.log; \
+    grep -qs wall_s $d/train.json || exit 1; \
+    /usr/bin/python3 -m quantlag.lag --model Qwen/Qwen2.5-0.5B-Instruct --micro 1 --steps 30 --kl-n 100 --variant $v --lr $lr --grids $g --kl-at $kl --replay $d --out $o 2>&1 \
+      | grep --line-buffered -v -i warn > results/logs/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_$(echo $g | tr , -).log; \
+  done; [ $(grep -ls wall_s results/lag_$(basename Qwen/Qwen2.5-0.5B-Instruct)_${v}_lr${lr}_*.json | wc -l) = $(echo $gs | wc -w) ] && rm -rf $d; done; done
