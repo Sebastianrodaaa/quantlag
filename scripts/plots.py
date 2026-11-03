@@ -16,7 +16,25 @@ def load():
     files = sorted(os.path.basename(f) for f in glob.glob("results/*.json") if not f.endswith("manifest.json"))
     json.dump(files, open("results/manifest.json", "w"), indent=1)
     data = [dict(json.load(open("results/" + f)), file=f) for f in files]
-    return [d for d in data if d["file"].startswith("lag_")], [d for d in data if d["file"].startswith("grpo_")]
+    return merge_lag([d for d in data if d["file"].startswith("lag_")]), [d for d in data if d["file"].startswith("grpo_")]
+
+
+def merge_lag(runs):
+    """Qwen phase 1 replays one trajectory per grid into separate files; join them per (model, variant, lr)."""
+    by = {}
+    for r in runs:
+        m = by.setdefault((r["config"]["model"], r["config"]["variant"], r["config"]["lr"]), r)
+        if m is r:
+            continue
+        for ms, rs in zip(m["steps"], r["steps"]):
+            ms["exports"].update(rs["exports"])
+        for k in r["kl"]:
+            o = next((q for q in m["kl"] if q["step"] == k["step"]), None)
+            o.update(k) if o else m["kl"].append(k)
+        m["wall_s"] = m.get("wall_s", 0) + r.get("wall_s", 0)
+    for m in by.values():
+        m["steps"][0]["exports"] = dict(sorted(m["steps"][0]["exports"].items(), key=lambda kv: ("bf16", "int8", "int4").index(kv[0].split("/")[0])))
+    return list(by.values())
 
 
 short = lambda m: m.split("/")[-1].replace("-Instruct", "")
