@@ -1,0 +1,33 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  51%|█████     | 148/290 [00:00<00:00, 1433.40it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1386.43it/s]
+kl {"step": 0, "tokens": 9474, "t": 370.817302942276, "int8/rtn": 0.001525044333316551, "int8/sr": 0.001525044333316551, "int8/ef": 0.001525044333316551, "stuck": 0.0}
+{"step": 1, "loss": 0.8663, "t_train": 65.4, "t_sync": 21.6, "int8/rtn": 0.002646, "int8/sr": 0.001722, "int8/ef": 0.0}
+{"step": 2, "loss": 0.6024, "t_train": 83.0, "t_sync": 23.6, "int8/rtn": 0.001031, "int8/sr": 0.001224, "int8/ef": 0.0}
+{"step": 3, "loss": 0.6931, "t_train": 57.3, "t_sync": 21.6, "int8/rtn": 0.001044, "int8/sr": 0.001009, "int8/ef": 0.0}
+{"step": 4, "loss": 0.5275, "t_train": 43.7, "t_sync": 13.1, "int8/rtn": 0.000894, "int8/sr": 0.000895, "int8/ef": 0.0}
+{"step": 5, "loss": 0.6686, "t_train": 32.2, "t_sync": 13.7, "int8/rtn": 0.000856, "int8/sr": 0.000803, "int8/ef": 0.0}
+{"step": 6, "loss": 0.4879, "t_train": 40.7, "t_sync": 12.5, "int8/rtn": 0.00074, "int8/sr": 0.000722, "int8/ef": 0.0}
+{"step": 7, "loss": 0.5559, "t_train": 36.4, "t_sync": 12.4, "int8/rtn": 0.000682, "int8/sr": 0.000651, "int8/ef": 0.0}
+{"step": 8, "loss": 0.4696, "t_train": 52.1, "t_sync": 14.5, "int8/rtn": 0.000616, "int8/sr": 0.000598, "int8/ef": 1e-06}
+{"step": 9, "loss": 0.6299, "t_train": 50.7, "t_sync": 13.4, "int8/rtn": 0.000571, "int8/sr": 0.000556, "int8/ef": 2e-06}
+{"step": 10, "loss": 0.6525, "t_train": 54.4, "t_sync": 15.8, "int8/rtn": 0.000543, "int8/sr": 0.000526, "int8/ef": 8e-06}
+{"step": 11, "loss": 0.684, "t_train": 52.2, "t_sync": 20.8, "int8/rtn": 0.000514, "int8/sr": 0.000498, "int8/ef": 2.2e-05}
+{"step": 12, "loss": 0.4534, "t_train": 38.9, "t_sync": 17.8, "int8/rtn": 0.000485, "int8/sr": 0.000474, "int8/ef": 6.4e-05}
+{"step": 13, "loss": 0.4668, "t_train": 49.2, "t_sync": 13.9, "int8/rtn": 0.000459, "int8/sr": 0.000447, "int8/ef": 0.000144}
+{"step": 14, "loss": 0.5701, "t_train": 38.5, "t_sync": 15.9, "int8/rtn": 0.00044, "int8/sr": 0.000428, "int8/ef": 0.000243}
+{"step": 15, "loss": 0.5107, "t_train": 46.1, "t_sync": 23.2, "int8/rtn": 0.000435, "int8/sr": 0.000423, "int8/ef": 0.000343}
+{"step": 16, "loss": 0.4453, "t_train": 66.5, "t_sync": 13.3, "int8/rtn": 0.000419, "int8/sr": 0.000408, "int8/ef": 0.000438}
+{"step": 17, "loss": 0.4575, "t_train": 67.6, "t_sync": 17.5, "int8/rtn": 0.000401, "int8/sr": 0.000392, "int8/ef": 0.000527}
+{"step": 18, "loss": 0.6337, "t_train": 53.3, "t_sync": 13.3, "int8/rtn": 0.000389, "int8/sr": 0.00038, "int8/ef": 0.000614}
+{"step": 19, "loss": 0.5786, "t_train": 46.6, "t_sync": 4.7, "int8/rtn": 0.000376, "int8/sr": 0.000366, "int8/ef": 0.000721}
+{"step": 20, "loss": 0.4636, "t_train": 32.8, "t_sync": 4.2, "int8/rtn": 0.000366, "int8/sr": 0.000357, "int8/ef": 0.000867}
+{"step": 21, "loss": 0.4531, "t_train": 41.2, "t_sync": 4.2, "int8/rtn": 0.000359, "int8/sr": 0.000348, "int8/ef": 0.001087}
+{"step": 22, "loss": 0.545, "t_train": 47.1, "t_sync": 4.5, "int8/rtn": 0.000345, "int8/sr": 0.000335, "int8/ef": 0.001471}
+{"step": 23, "loss": 0.4997, "t_train": 50.9, "t_sync": 6.5, "int8/rtn": 0.000343, "int8/sr": 0.000334, "int8/ef": 0.002202}
+{"step": 24, "loss": 0.4794, "t_train": 45.7, "t_sync": 9.1, "int8/rtn": 0.000331, "int8/sr": 0.000323, "int8/ef": 0.00355}
+{"step": 25, "loss": 0.6412, "t_train": 42.4, "t_sync": 9.6, "int8/rtn": 0.000337, "int8/sr": 0.000327, "int8/ef": 0.005713}
+{"step": 26, "loss": 0.5068, "t_train": 53.1, "t_sync": 9.3, "int8/rtn": 0.000327, "int8/sr": 0.000318, "int8/ef": 0.008698}
+{"step": 27, "loss": 0.4624, "t_train": 53.4, "t_sync": 4.7, "int8/rtn": 0.00032, "int8/sr": 0.000311, "int8/ef": 0.012358}
+{"step": 28, "loss": 0.4926, "t_train": 43.3, "t_sync": 4.7, "int8/rtn": 0.000316, "int8/sr": 0.000309, "int8/ef": 0.016417}
+{"step": 29, "loss": 0.4691, "t_train": 52.1, "t_sync": 4.0, "int8/rtn": 0.00032, "int8/sr": 0.000314, "int8/ef": 0.020547}
+{"step": 30, "loss": 0.6166, "t_train": 49.4, "t_sync": 3.5, "int8/rtn": 0.000325, "int8/sr": 0.000317, "int8/ef": 0.024473}
+kl {"step": 30, "tokens": 9474, "t": 368.9092712402344, "int8/rtn": 0.001327142600028849, "int8/sr": 0.0014865796106700146, "int8/ef": 0.012611238542789996, "stuck": 0.23705488751309994}
