@@ -133,10 +133,18 @@ def summary(lag, grpo):
         lines.append("")
     if grpo:
         lines += ["## Phase 2: GRPO, int8 served rollouts", "", "| arm | seed | steps | s/step | eval step | n | acc |", "|---|---|---|---|---|---|---|"]
-        for r in sorted(grpo, key=lambda r: (r["config"]["arm"], r["config"]["seed"])):
+        for r in sorted((g for g in grpo if g["steps"]), key=lambda r: (r["config"]["arm"], r["config"]["seed"])):
             per = np.mean([s["t_gen"] + s["t_train"] + s["t_sync"] for s in r["steps"]]) if r["steps"] else np.nan
             for e in r["evals"] or [{"step": "-", "n": "-", "acc": float("nan")}]:
                 lines.append(f"| {r['config']['arm']} | {r['config']['seed']} | {len(r['steps'])} | {per:.0f} | {e['step']} | {e['n']} | {100 * e['acc']:.1f}% |")
+        lines += ["", "Per arm (mean and range over finished seeds; step 0 = the untrained policy on the same served grid):", "",
+                  "| arm | seeds | step-0 acc | step-20 acc mean | min | max |", "|---|---|---|---|---|---|"]
+        for arm in ["fp32", "rtn", "ef", "qurl"]:
+            acc = [e["acc"] for r in grpo if r["config"]["arm"] == arm and r["steps"] for e in r["evals"] if e["step"] == len(r["steps"])]
+            z = [e["acc"] for r in grpo if r["config"]["arm"] == arm and not r["steps"] for e in r["evals"]]
+            if acc or z:
+                f = lambda v: f"{100 * v:.1f}%"
+                lines.append(f"| {arm} | {len(acc)} | {f(z[0]) if z else '-'} | {f(np.mean(acc)) if acc else '-'} | {f(min(acc)) if acc else '-'} | {f(max(acc)) if acc else '-'} |")
     open("results/summary.md", "w").write("\n".join(lines) + "\n")
 
 
@@ -149,9 +157,8 @@ def main():
             fig_changed(lag, m, lr, f"{OUT}/changed_{short(m)}_lr{lr:g}.png")
     if models:
         fig_kl(lag, models, f"{OUT}/kl.png")
-    grpo = [g for g in grpo if g["steps"]]
-    if grpo:
-        fig_grpo(grpo, f"{OUT}/grpo.png")
+    if any(g["steps"] for g in grpo):
+        fig_grpo([g for g in grpo if g["steps"]], f"{OUT}/grpo.png")
     summary(lag, grpo)
 
 
