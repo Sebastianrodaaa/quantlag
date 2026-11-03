@@ -209,7 +209,7 @@ function render() {
   main.appendChild(card("w6", "held-out gsm8k accuracy", "greedy, 256 new tokens", "test split, first n problems; step 0 is shared where the served weights are identical", accRows.length ? tbl : document.createTextNode("phase 2 pending")));
   const wall = document.createElement("table");
   wall.innerHTML = "<tr><th>run</th><th>steps</th><th>s / step</th><th>wall</th></tr>" + [...LAG, ...GRPO].map(r => { const n = r.steps.length, w = r.wall_s; const name = r.config.arm ? `grpo ${r.config.arm} s${r.config.seed}` : `lag ${r.config.model.split("/")[1].split("-")[0]} ${r.config.variant} ${r.config.lr.toExponential(0)}`;
-    const per = mean(r.steps.map(s => (s.t_gen || 0) + (s.t_train || 0) + (s.t_sync || 0))); return `<tr><td>${name}</td><td>${n}</td><td>${per.toFixed(1)}</td><td>${w ? (w / 3600).toFixed(2) + " h" : "running"}</td></tr>`; }).join("");
+    const per = mean(r.steps.map(s => (s.t_gen || 0) + (s.t_train || 0) + (s.t_sync || 0))); return `<tr><td>${name}</td><td>${n}</td><td>${n ? per.toFixed(1) : "-"}</td><td>${w ? (w / 3600).toFixed(2) + " h" : "running"}</td></tr>`; }).join("");
   main.appendChild(card("w12", "runs", "", "every run on this machine, read from results/*.json", wall));
   const any = LAG[0] || GRPO[0];
   document.getElementById("meta").textContent = any ? `cpu\n${any.cpu}\ntorch ${any.torch}, ${any.threads} threads\n\n${LAG.length} phase 1 runs\n${GRPO.length} phase 2 runs` : "";
