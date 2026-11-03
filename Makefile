@@ -33,9 +33,10 @@ P2_LR ?= 3e-6
 VARIANTS ?= plain qurl
 P2_STEPS ?= 20
 P2_EVAL_N ?= 500
+P2_SEEDS ?= 0 1 2
 phase2:
 	mkdir -p results/logs
-	for s in 0 1 2; do for arm in rtn ef qurl $$( [ $$s = 0 ] && echo fp32 ); do \
+	for s in $(P2_SEEDS); do for arm in rtn ef qurl $$( [ $$s = 0 ] && echo fp32 ); do \
 	  [ -f results/grpo_$${arm}_int8_s$$s.json ] && grep -q wall_s results/grpo_$${arm}_int8_s$$s.json && continue; \
 	  $(PY) -m quantlag.grpo --arm $$arm --seed $$s --lr $(P2_LR) --steps $(P2_STEPS) --eval-at $(P2_STEPS) --eval-n $(P2_EVAL_N) 2>&1 \
 	    | grep --line-buffered -v -i warn | tee results/logs/grpo_$${arm}_s$$s.log || exit 1; done; done
@@ -48,10 +49,11 @@ phase2:
 # replay fits in memory next to a phase 2 run. Finished pieces are skipped, so it can be rerun after a kill.
 QWEN ?= Qwen/Qwen2.5-0.5B-Instruct
 QWEN_STEPS ?= 30
+QWEN_VARIANTS ?= plain qurl
 LAG_Q = $(PY) -m quantlag.lag --model $(QWEN) --micro 1 --steps $(QWEN_STEPS) --kl-n $(KL_N)
 lag-split:
 	mkdir -p results/logs
-	for v in plain qurl; do for lr in $(LRS); do kl=$(QWEN_STEPS); [ $$lr = 1e-6 ] && kl=0,$(QWEN_STEPS); \
+	for v in $(QWEN_VARIANTS); do for lr in $(LRS); do kl=$(QWEN_STEPS); [ $$lr = 1e-6 ] && kl=0,$(QWEN_STEPS); \
 	  d=results/traj_$${v}_lr$$lr; [ $$v = plain ] && gs="bf16 int8 int4" || gs="bf16,int8,int4"; \
 	  for g in $$gs; do o=results/lag_$$(basename $(QWEN))_$${v}_lr$${lr}_$$(echo $$g | tr , -).json; \
 	    grep -qs wall_s $$o && continue; \
