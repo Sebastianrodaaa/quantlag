@@ -1,0 +1,29 @@
+{
+ "config": {
+  "model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "arm": "qurl",
+  "grid": "int8",
+  "seed": 0,
+  "steps": 0,
+  "lr": 1e-06,
+  "prompts": 8,
+  "samples": 4,
+  "max_new": 256,
+  "eval_at": "0",
+  "eval_n": 500,
+  "out": "results/grpo_step0_qurl.json"
+ },
+ "cpu": "Intel(R) Xeon(R) Processor x8",
+ "torch": "2.14.1+cpu",
+ "threads": 8,
+ "steps": [],
+ "evals": [
+  {
+   "step": 0,
+   "n": 500,
+   "acc": 0.308,
+   "t": 1491.5297260284424
+  }
+ ],
+ "wall_s": 1491.5300421714783
+}

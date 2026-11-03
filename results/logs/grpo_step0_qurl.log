@@ -1,0 +1,3 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  72%|███████▏  | 209/290 [00:00<00:00, 2075.97it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 2112.02it/s]
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  75%|███████▍  | 217/290 [00:00<00:00, 2139.97it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 2169.90it/s]
+eval step 0: acc 0.308 (1492s)
